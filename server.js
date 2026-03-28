@@ -95,10 +95,16 @@ app.get('/api/region', (req, res) => {
 });
 
 // Serve frontend
-app.get('/', (req, res) => {
-  res.send('API is running 🚀');
-});
-else {
+if (process.env.NODE_ENV === 'production') {
+  // Production: Serve static files from dist folder
+  const distPath = path.join(__dirname, 'dist');
+  app.use(express.static(distPath));
+
+  // SPA: Send index.html for any non-API route
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(distPath, 'index.html'));
+  });
+} else {
   // Development: Proxy non-API requests to Vite dev server
   const viteUrl = process.env.VITE_DEV_SERVER_URL || 'http://localhost:5000';
 

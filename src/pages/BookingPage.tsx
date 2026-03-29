@@ -16,7 +16,7 @@ import {
 import { parsePrice } from "@/context/CurrencyContext";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft } from "lucide-react";
-import { validateCoupon, calculateDiscount, Coupon, incrementCouponUsage } from "@/utils/couponUtils";
+import { validateCouponFromAPI, calculateDiscount, Coupon, incrementCouponUsageFromAPI } from "@/utils/couponUtils";
 
 // Email validation function
 const validateEmail = (email: string) => {
@@ -119,6 +119,7 @@ const BookingPage = () => {
   const [couponCode, setCouponCode] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
   const [couponError, setCouponError] = useState("");
+  const [couponValidating, setCouponValidating] = useState(false);
 
   // Find package data
   let destination: Destination | undefined;
@@ -163,7 +164,7 @@ const BookingPage = () => {
   const finalPrice = Math.max(0, baseTotal - discountAmount);
 
   // Handle coupon application
-  const handleApplyCoupon = () => {
+  const handleApplyCoupon = async () => {
     setCouponError("");
 
     if (!couponCode.trim()) {
@@ -171,7 +172,10 @@ const BookingPage = () => {
       return;
     }
 
-    const validation = validateCoupon(couponCode, packageSlug || "");
+    setCouponValidating(true);
+    const validation = await validateCouponFromAPI(couponCode, packageSlug || "");
+    setCouponValidating(false);
+
     if (!validation.valid) {
       setCouponError(validation.error || "Invalid coupon code");
       setAppliedCoupon(null);
@@ -296,7 +300,7 @@ const BookingPage = () => {
 
       // Increment coupon usage if applied
       if (appliedCoupon) {
-        incrementCouponUsage(appliedCoupon.id);
+        await incrementCouponUsageFromAPI(appliedCoupon.id);
       }
 
       // Send email via EmailJS
@@ -415,6 +419,7 @@ const BookingPage = () => {
                 onApplyCoupon={handleApplyCoupon}
                 onRemoveCoupon={handleRemoveCoupon}
                 onCouponCodeChange={setCouponCode}
+                couponValidating={couponValidating}
               />
             )}
 

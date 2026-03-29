@@ -6,6 +6,7 @@ import { initDB } from './backend/db/index.js';
 import authRoutes from './backend/routes/auth.js';
 import bookingRoutes from './backend/routes/bookings.js';
 import testimonialRoutes from './backend/routes/testimonials.js';
+import couponRoutes from './backend/routes/coupons.js';
 import proxyMiddleware from 'express-http-proxy';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -34,6 +35,7 @@ initDB().catch(err => {
 app.use('/api/auth', authRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/testimonials', testimonialRoutes);
+app.use('/api/coupons', couponRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

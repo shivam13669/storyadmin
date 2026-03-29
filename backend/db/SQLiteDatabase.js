@@ -102,10 +102,27 @@ export class SQLiteDatabase extends IDatabase {
         )
       `);
 
+      // Coupons table
+      this.db.run(`
+        CREATE TABLE IF NOT EXISTS coupons (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          code TEXT UNIQUE NOT NULL,
+          discount INTEGER NOT NULL,
+          discountType TEXT NOT NULL,
+          maxUses INTEGER NOT NULL,
+          usedCount INTEGER NOT NULL DEFAULT 0,
+          expiryDate TEXT NOT NULL,
+          isActive INTEGER NOT NULL DEFAULT 1,
+          createdDate TEXT NOT NULL,
+          applicablePackages TEXT NOT NULL
+        )
+      `);
+
       // Create indexes
       this.db.run(`CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)`);
       this.db.run(`CREATE INDEX IF NOT EXISTS idx_bookings_userId ON bookings(userId)`);
       this.db.run(`CREATE INDEX IF NOT EXISTS idx_testimonials_userId ON testimonials(userId)`);
+      this.db.run(`CREATE INDEX IF NOT EXISTS idx_coupons_code ON coupons(code)`);
 
       this._save();
     } catch (error) {
@@ -590,5 +607,124 @@ export class SQLiteDatabase extends IDatabase {
     } catch (error) {
       throw new Error(`Failed to check mobile number: ${error.message}`);
     }
+  }
+
+  // ============ Coupons Operations ============
+
+  async createCoupon(couponData) {
+    try {
+      const { code, discount, discountType, maxUses, expiryDate, applicablePackages } = couponData;
+
+      this.db.run(
+        `INSERT INTO coupons (code, discount, discountType, maxUses, usedCount, expiryDate, isActive, createdDate, applicablePackages)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [code.toUpperCase(), discount, discountType, maxUses, 0, expiryDate, 1, new Date().toISOString(), applicablePackages]
+      );
+
+      this._save();
+
+      const result = this.db.exec(`SELECT last_insert_rowid() as id`);
+      const couponId = result[0].values[0][0];
+
+      return this._getCouponById(couponId);
+    } catch (error) {
+      throw new Error(`Failed to create coupon: ${error.message}`);
+    }
+  }
+
+  async getAllCoupons() {
+    try {
+      const result = this.db.exec(
+        `SELECT id, code, discount, discountType, maxUses, usedCount, expiryDate, isActive, createdDate, applicablePackages FROM coupons ORDER BY createdDate DESC`
+      );
+
+      if (!result || result.length === 0) {
+        return [];
+      }
+
+      return result[0].values.map(row => this._mapCouponRow(row));
+    } catch (error) {
+      throw new Error(`Failed to get all coupons: ${error.message}`);
+    }
+  }
+
+  async getCouponByCode(code) {
+    try {
+      const result = this.db.exec(
+        `SELECT id, code, discount, discountType, maxUses, usedCount, expiryDate, isActive, createdDate, applicablePackages FROM coupons WHERE UPPER(code) = ?`,
+        [code.toUpperCase()]
+      );
+
+      if (!result || result.length === 0 || result[0].values.length === 0) {
+        return null;
+      }
+
+      return this._mapCouponRow(result[0].values[0]);
+    } catch (error) {
+      throw new Error(`Failed to get coupon by code: ${error.message}`);
+    }
+  }
+
+  async updateCoupon(id, updates) {
+    try {
+      const fields = [];
+      const values = [];
+
+      for (const [key, value] of Object.entries(updates)) {
+        fields.push(`${key} = ?`);
+        values.push(value);
+      }
+
+      values.push(id);
+
+      this.db.run(
+        `UPDATE coupons SET ${fields.join(', ')} WHERE id = ?`,
+        values
+      );
+
+      this._save();
+
+      return this._getCouponById(id);
+    } catch (error) {
+      throw new Error(`Failed to update coupon: ${error.message}`);
+    }
+  }
+
+  async deleteCoupon(id) {
+    try {
+      this.db.run(`DELETE FROM coupons WHERE id = ?`, [id]);
+      this._save();
+      return true;
+    } catch (error) {
+      throw new Error(`Failed to delete coupon: ${error.message}`);
+    }
+  }
+
+  _getCouponById(id) {
+    const result = this.db.exec(
+      `SELECT id, code, discount, discountType, maxUses, usedCount, expiryDate, isActive, createdDate, applicablePackages FROM coupons WHERE id = ?`,
+      [id]
+    );
+
+    if (!result || result.length === 0 || result[0].values.length === 0) {
+      return null;
+    }
+
+    return this._mapCouponRow(result[0].values[0]);
+  }
+
+  _mapCouponRow(row) {
+    return {
+      id: row[0],
+      code: row[1],
+      discount: row[2],
+      discountType: row[3],
+      maxUses: row[4],
+      usedCount: row[5],
+      expiryDate: row[6],
+      isActive: row[7] === 1,
+      createdDate: row[8],
+      applicablePackages: row[9]
+    };
   }
 }

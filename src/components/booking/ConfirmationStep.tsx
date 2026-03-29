@@ -18,9 +18,10 @@ interface ConfirmationStepProps {
   couponCode: string;
   couponError: string;
   discountAmount: number;
-  onApplyCoupon: () => void;
+  onApplyCoupon: () => void | Promise<void>;
   onRemoveCoupon: () => void;
   onCouponCodeChange: (code: string) => void;
+  couponValidating?: boolean;
 }
 
 const ConfirmationStep = ({
@@ -37,6 +38,7 @@ const ConfirmationStep = ({
   onApplyCoupon,
   onRemoveCoupon,
   onCouponCodeChange,
+  couponValidating = false,
 }: ConfirmationStepProps) => {
   const travelDateObj = new Date(formData.travelDate);
   const formattedDate = travelDateObj.toLocaleDateString("en-IN", {
@@ -212,18 +214,20 @@ const ConfirmationStep = ({
                   value={couponCode}
                   onChange={(e) => onCouponCodeChange(e.target.value.toUpperCase())}
                   onKeyPress={(e) => {
-                    if (e.key === 'Enter') {
+                    if (e.key === 'Enter' && !couponValidating) {
                       onApplyCoupon();
                     }
                   }}
                   className="text-sm"
+                  disabled={couponValidating}
                 />
                 <Button
                   type="button"
                   onClick={onApplyCoupon}
                   className="bg-blue-600 hover:bg-blue-700 text-white"
+                  disabled={couponValidating}
                 >
-                  Apply
+                  {couponValidating ? "Validating..." : "Apply"}
                 </Button>
               </div>
             )}

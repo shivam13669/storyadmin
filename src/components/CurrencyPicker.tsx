@@ -13,11 +13,14 @@ export function CurrencyPicker({
   className,
 }: {
   value: string;
-  onChange: (code: string) => void;
+  onChange?: (code: string) => void;
   className?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
+
+  // Default to no-op function if onChange is not provided
+  const handleChange = onChange || (() => {});
 
   const display = getCurrencyByCode(value);
   const flagCc = (FLAG_BY_CURRENCY[display.code] || display.code.slice(0, 2)).toLowerCase();
@@ -77,7 +80,7 @@ export function CurrencyPicker({
                   key={c.code}
                   c={c}
                   onSelect={() => {
-                    onChange(c.code);
+                    handleChange(c.code);
                     setOpen(false);
                   }}
                 />
@@ -91,7 +94,7 @@ export function CurrencyPicker({
                   key={c.code}
                   c={c}
                   onSelect={() => {
-                    onChange(c.code);
+                    handleChange(c.code);
                     setOpen(false);
                   }}
                 />

@@ -17,28 +17,48 @@ import { useToast } from "@/hooks/use-toast";
 import { AlertCircle, CheckCircle, Copy, Trash2, ChevronDown } from "lucide-react";
 import { format } from "date-fns";
 import { destinations } from "@/data/destinations";
-import { Coupon, getCouponsFromStorage, saveCouponsToStorage } from "@/utils/couponUtils";
+import { Coupon } from "@/utils/couponUtils";
 
 interface AdminCouponsViewProps {
   initialCoupons?: Coupon[];
 }
 
+const API_URL = '/api';
+
 export function AdminCouponsView({ initialCoupons = [] }: AdminCouponsViewProps) {
   const { toast } = useToast();
-  const [coupons, setCoupons] = useState<Coupon[]>(() => {
-    // Load coupons from localStorage on component mount
-    const stored = getCouponsFromStorage();
-    return stored.length > 0 ? stored : initialCoupons;
-  });
+  const [coupons, setCoupons] = useState<Coupon[]>(initialCoupons);
   const [loading, setLoading] = useState(false);
+  const [fetchingCoupons, setFetchingCoupons] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  // Save coupons to localStorage whenever they change
+  // Fetch coupons from API on component mount
   useEffect(() => {
-    saveCouponsToStorage(coupons);
-  }, [coupons]);
+    const fetchCoupons = async () => {
+      try {
+        setFetchingCoupons(true);
+        const response = await fetch(`${API_URL}/coupons`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch coupons');
+        }
+        const data = await response.json();
+        setCoupons(data.coupons || []);
+      } catch (err) {
+        console.error('Error fetching coupons:', err);
+        toast({
+          title: "Error",
+          description: "Failed to load coupons",
+          variant: "destructive"
+        });
+      } finally {
+        setFetchingCoupons(false);
+      }
+    };
+
+    fetchCoupons();
+  }, [toast]);
 
   const [formData, setFormData] = useState({
     code: "",
@@ -131,22 +151,30 @@ export function AdminCouponsView({ initialCoupons = [] }: AdminCouponsViewProps)
 
     setLoading(true);
     try {
-      const newCoupon: Coupon = {
-        id: Date.now().toString(),
-        code: formData.code.toUpperCase(),
-        discount: Number(formData.discount),
-        discountType: formData.discountType,
-        maxUses: Number(formData.maxUses),
-        usedCount: 0,
-        expiryDate: formData.expiryDate,
-        isActive: true,
-        createdDate: new Date().toISOString(),
-        applicablePackages: formData.applicablePackages,
-      };
+      const response = await fetch(`${API_URL}/coupons`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          code: formData.code.toUpperCase(),
+          discount: Number(formData.discount),
+          discountType: formData.discountType,
+          maxUses: Number(formData.maxUses),
+          expiryDate: formData.expiryDate,
+          applicablePackages: formData.applicablePackages,
+        }),
+      });
 
-      setCoupons([...coupons, newCoupon]);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to create coupon');
+      }
+
+      const data = await response.json();
+      setCoupons([...coupons, data.coupon]);
       setSuccess("Coupon created successfully!");
-      toast({ title: "Success", description: `Coupon ${newCoupon.code} created` });
+      toast({ title: "Success", description: `Coupon ${data.coupon.code} created` });
 
       // Reset form
       setFormData({
@@ -171,9 +199,25 @@ export function AdminCouponsView({ initialCoupons = [] }: AdminCouponsViewProps)
     }
   };
 
-  const handleDeleteCoupon = (id: string) => {
-    setCoupons(coupons.filter((c) => c.id !== id));
-    toast({ title: "Success", description: "Coupon deleted" });
+  const handleDeleteCoupon = async (id: string | number) => {
+    try {
+      const response = await fetch(`${API_URL}/coupons/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete coupon');
+      }
+
+      setCoupons(coupons.filter((c) => c.id !== id));
+      toast({ title: "Success", description: "Coupon deleted" });
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: err instanceof Error ? err.message : "Failed to delete coupon",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleCopyCode = (code: string) => {

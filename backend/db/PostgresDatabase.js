@@ -151,10 +151,26 @@ export class PostgresDatabase extends IDatabase {
       )
     `);
 
+    await this._query(`
+      CREATE TABLE IF NOT EXISTS coupons (
+        id SERIAL PRIMARY KEY,
+        code TEXT UNIQUE NOT NULL,
+        discount INTEGER NOT NULL,
+        discount_type TEXT NOT NULL,
+        max_uses INTEGER NOT NULL,
+        used_count INTEGER NOT NULL DEFAULT 0,
+        expiry_date TEXT NOT NULL,
+        is_active BOOLEAN NOT NULL DEFAULT TRUE,
+        created_date TEXT NOT NULL,
+        applicable_packages TEXT NOT NULL
+      )
+    `);
+
     await this._query(`CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)`);
     await this._query(`CREATE INDEX IF NOT EXISTS idx_users_mobile_number ON users(mobile_number)`);
     await this._query(`CREATE INDEX IF NOT EXISTS idx_bookings_user_id ON bookings(user_id)`);
     await this._query(`CREATE INDEX IF NOT EXISTS idx_testimonials_user_id ON testimonials(user_id)`);
+    await this._query(`CREATE INDEX IF NOT EXISTS idx_coupons_code ON coupons(code)`);
   }
 
   async _initializeAdmin() {
@@ -575,6 +591,121 @@ export class PostgresDatabase extends IDatabase {
       return result.rows.length > 0;
     } catch (error) {
       throw new Error(`Failed to check mobile number: ${error.message}`);
+    }
+  }
+
+  // ============ Coupons Operations ============
+
+  _mapCouponRow(row) {
+    return {
+      id: row.id,
+      code: row.code,
+      discount: row.discount,
+      discountType: row.discount_type,
+      maxUses: row.max_uses,
+      usedCount: row.used_count,
+      expiryDate: row.expiry_date,
+      isActive: row.is_active,
+      createdDate: row.created_date,
+      applicablePackages: row.applicable_packages,
+    };
+  }
+
+  async createCoupon(couponData) {
+    try {
+      const { code, discount, discountType, maxUses, expiryDate, applicablePackages } = couponData;
+      const result = await this._query(
+        `INSERT INTO coupons (code, discount, discount_type, max_uses, used_count, expiry_date, is_active, created_date, applicable_packages)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+         RETURNING id, code, discount, discount_type, max_uses, used_count, expiry_date, is_active, created_date, applicable_packages`,
+        [code.toUpperCase(), discount, discountType, maxUses, 0, expiryDate, true, new Date().toISOString(), applicablePackages]
+      );
+
+      return this._mapCouponRow(result.rows[0]);
+    } catch (error) {
+      throw new Error(`Failed to create coupon: ${error.message}`);
+    }
+  }
+
+  async getAllCoupons() {
+    try {
+      const result = await this._query(
+        `SELECT id, code, discount, discount_type, max_uses, used_count, expiry_date, is_active, created_date, applicable_packages FROM coupons ORDER BY created_date DESC`
+      );
+
+      return result.rows.map((row) => this._mapCouponRow(row));
+    } catch (error) {
+      throw new Error(`Failed to get all coupons: ${error.message}`);
+    }
+  }
+
+  async getCouponByCode(code) {
+    try {
+      const result = await this._query(
+        `SELECT id, code, discount, discount_type, max_uses, used_count, expiry_date, is_active, created_date, applicable_packages FROM coupons WHERE UPPER(code) = $1`,
+        [code.toUpperCase()]
+      );
+
+      if (result.rows.length === 0) {
+        return null;
+      }
+
+      return this._mapCouponRow(result.rows[0]);
+    } catch (error) {
+      throw new Error(`Failed to get coupon by code: ${error.message}`);
+    }
+  }
+
+  async updateCoupon(id, updates) {
+    try {
+      const entries = Object.entries(updates);
+      if (entries.length === 0) {
+        return this.getCouponById(id);
+      }
+
+      const fields = [];
+      const values = [];
+
+      entries.forEach(([key, value], index) => {
+        const column = key
+          .replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`)
+          .replace(/^id$/, 'id');
+        fields.push(`${column} = $${index + 1}`);
+        values.push(value);
+      });
+
+      values.push(id);
+
+      await this._query(`UPDATE coupons SET ${fields.join(', ')} WHERE id = $${values.length}`, values);
+      return this.getCouponById(id);
+    } catch (error) {
+      throw new Error(`Failed to update coupon: ${error.message}`);
+    }
+  }
+
+  async deleteCoupon(id) {
+    try {
+      await this._query(`DELETE FROM coupons WHERE id = $1`, [id]);
+      return true;
+    } catch (error) {
+      throw new Error(`Failed to delete coupon: ${error.message}`);
+    }
+  }
+
+  async getCouponById(id) {
+    try {
+      const result = await this._query(
+        `SELECT id, code, discount, discount_type, max_uses, used_count, expiry_date, is_active, created_date, applicable_packages FROM coupons WHERE id = $1`,
+        [id]
+      );
+
+      if (result.rows.length === 0) {
+        return null;
+      }
+
+      return this._mapCouponRow(result.rows[0]);
+    } catch (error) {
+      throw new Error(`Failed to get coupon by id: ${error.message}`);
     }
   }
 }

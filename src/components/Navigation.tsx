@@ -175,13 +175,27 @@ const Navigation = () => {
                   </a>
                 );
               })}
-              <div className="px-3 py-2 flex items-center gap-2">
-                <CurrencyPicker value={currency} onChange={setCurrencyWithRegion} className="flex-1" />
-                {isAuthenticated && user ? (
-                  <>
+              <div className="px-3 py-2 space-y-2">
+                <div className="flex items-center gap-2">
+                  <CurrencyPicker value={currency} onChange={setCurrencyWithRegion} className="flex-1" />
+                  {isAuthenticated && user ? (
                     <div className="text-white/90 text-sm font-medium px-2 py-1">
                       Hi, {getFirstName(user.fullName)}
                     </div>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        setIsLoginModalOpen(true);
+                        setIsOpen(false);
+                      }}
+                      className="flex-none px-4 py-2 rounded-md bg-white/10 text-white text-sm font-medium hover:bg-white/20 transition-colors"
+                    >
+                      Login
+                    </button>
+                  )}
+                </div>
+                {isAuthenticated && user ? (
+                  <>
                     <Link
                       to={isAdmin ? "/admin/dashboard" : "/dashboard"}
                       className="block px-3 py-2 text-white/90 hover:text-white hover:bg-white/10 rounded-md transition-colors text-sm flex items-center gap-2"
@@ -209,17 +223,7 @@ const Navigation = () => {
                       Logout
                     </button>
                   </>
-                ) : (
-                  <button
-                    onClick={() => {
-                      setIsLoginModalOpen(true);
-                      setIsOpen(false);
-                    }}
-                    className="flex-none px-4 py-2 rounded-md bg-white/10 text-white text-sm font-medium hover:bg-white/20 transition-colors"
-                  >
-                    Login
-                  </button>
-                )}
+                ) : null}
               </div>
             </div>
           </div>

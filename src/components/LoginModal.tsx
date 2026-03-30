@@ -231,7 +231,6 @@ export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to send OTP';
       toast.error(errorMessage);
-      console.error('Send OTP error:', error);
     } finally {
       setIsSigningUp(false);
       setIsSendingOTP(false);
@@ -395,7 +394,6 @@ export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to send OTP';
       toast.error(errorMessage);
-      console.error('Send OTP error:', error);
     } finally {
       setIsSendingOTP(false);
     }

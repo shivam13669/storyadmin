@@ -230,14 +230,14 @@ export function UserManagementSystemView({ users, onDataChange }: UserManagement
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h3 className="text-2xl font-bold text-gray-900">User Management</h3>
           <p className="text-sm text-gray-600 mt-1">
             Manage and view all registered users in your system
           </p>
         </div>
-        <Button onClick={handleExportList} className="flex items-center gap-2">
+        <Button onClick={handleExportList} className="flex items-center gap-2 w-full lg:w-auto">
           <Download className="w-4 h-4" />
           Export List
         </Button>

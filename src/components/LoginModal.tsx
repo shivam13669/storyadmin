@@ -1272,95 +1272,332 @@ export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
             ) : (
               // Forgot Password Form
               <div className="p-7 space-y-6 flex flex-col">
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-900 mb-1">
-                    Forgotten Your Password?
-                  </h2>
-                  <p className="text-sm text-gray-600">
-                    Don't worry, we'll send you a message to help you reset your password.
-                  </p>
-                </div>
-
-                <form onSubmit={handleForgotPassword} className="space-y-4">
-                  {/* Email Field */}
-                  <div className="space-y-2">
-                    <label className="block text-sm font-semibold text-gray-900">
-                      Email Address
-                    </label>
-                    <div className="relative group">
-                      <Mail className="absolute left-3.5 top-3.5 h-5 w-5 text-gray-400 group-focus-within:text-orange-500 transition-colors" />
-                      <Input
-                        type="text"
-                        placeholder="you@example.com"
-                        value={forgotPasswordEmail}
-                        onChange={(e) => {
-                          setForgotPasswordEmail(e.target.value);
-                          setForgotPasswordEmailError("");
-                        }}
-                        className={`w-full pl-11 pr-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20 bg-gray-50/50 transition-all ${
-                          forgotPasswordEmailError ? 'border-red-400 focus:border-red-500 focus:ring-red-500/20' : 'border-gray-200 focus:border-orange-500'
-                        }`}
-                        required
-                      />
+                {!showOTPVerification ? (
+                  // Email Input Form
+                  <>
+                    <div>
+                      <h2 className="text-2xl font-bold text-gray-900 mb-1">
+                        Forgotten Your Password?
+                      </h2>
+                      <p className="text-sm text-gray-600">
+                        Don't worry, we'll send you a message to help you reset your password.
+                      </p>
                     </div>
-                    {forgotPasswordEmailError && (
-                      <p className="text-xs text-red-500 font-medium">{forgotPasswordEmailError}</p>
+
+                    <form onSubmit={handleForgotPassword} className="space-y-4">
+                      {/* Email Field */}
+                      <div className="space-y-2">
+                        <label className="block text-sm font-semibold text-gray-900">
+                          Email Address
+                        </label>
+                        <div className="relative group">
+                          <Mail className="absolute left-3.5 top-3.5 h-5 w-5 text-gray-400 group-focus-within:text-orange-500 transition-colors" />
+                          <Input
+                            type="text"
+                            placeholder="you@example.com"
+                            value={forgotPasswordEmail}
+                            onChange={(e) => {
+                              setForgotPasswordEmail(e.target.value);
+                              setForgotPasswordEmailError("");
+                            }}
+                            className={`w-full pl-11 pr-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20 bg-gray-50/50 transition-all ${
+                              forgotPasswordEmailError ? 'border-red-400 focus:border-red-500 focus:ring-red-500/20' : 'border-gray-200 focus:border-orange-500'
+                            }`}
+                            required
+                          />
+                        </div>
+                        {forgotPasswordEmailError && (
+                          <p className="text-xs text-red-500 font-medium">{forgotPasswordEmailError}</p>
+                        )}
+                      </div>
+
+                      {/* Continue Button */}
+                      <button
+                        type="submit"
+                        disabled={isSendingOTP}
+                        className="w-full mt-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed text-white font-bold py-3 px-6 rounded-lg flex items-center justify-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl"
+                      >
+                        {isSendingOTP ? "Sending OTP..." : "Continue"}
+                      </button>
+                    </form>
+
+                    {/* Return to Login */}
+                    <div className="text-center pt-2">
+                      <button
+                        type="button"
+                        onClick={returnToLogin}
+                        className="text-sm text-orange-600 hover:text-orange-700 font-semibold transition-colors"
+                      >
+                        Return to Log in
+                      </button>
+                    </div>
+
+                    {/* Divider */}
+                    <div className="relative flex items-center gap-3 py-1">
+                      <div className="flex-1 border-t border-gray-200"></div>
+                    </div>
+
+                    {/* Trust Section */}
+                    <div className="mt-6 pt-5 border-t border-gray-100">
+                      <p className="text-xs font-bold text-gray-900 uppercase tracking-wider mb-3">
+                        🏆 Book With Confidence
+                      </p>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="bg-gradient-to-br from-green-50 to-green-50/50 p-3 rounded-lg border border-green-100">
+                          <div className="text-lg font-bold text-green-600">4.8</div>
+                          <p className="text-xs text-gray-600 mt-1">2.5K+ Reviews</p>
+                        </div>
+                        <div className="bg-gradient-to-br from-blue-50 to-blue-50/50 p-3 rounded-lg border border-blue-100">
+                          <div className="text-lg font-bold text-blue-600">4.6</div>
+                          <p className="text-xs text-gray-600 mt-1">15K+ Bookings</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Terms Text */}
+                    <p className="text-xs text-gray-500 text-center mt-4">
+                      By continuing, you agree to StoriesByFoot's{" "}
+                      <a href="/terms-and-condition" className="text-orange-600 hover:underline">
+                        Terms & Conditions
+                      </a>
+                      {" "}and{" "}
+                      <a href="/privacy-policy" className="text-orange-600 hover:underline">
+                        Privacy Policy
+                      </a>
+                    </p>
+                  </>
+                ) : (
+                  // OTP Verification & Password Reset Screen
+                  <>
+                    {!isPasswordResetOTPVerified ? (
+                      // OTP Verification Form
+                      <>
+                        <div className="text-center space-y-3">
+                          <div className="w-16 h-16 mx-auto bg-gradient-to-br from-orange-50 to-orange-100 rounded-full flex items-center justify-center">
+                            <Mail className="w-8 h-8 text-orange-600" />
+                          </div>
+                          <div>
+                            <h2 className="text-2xl font-bold text-gray-900">Verify Your Email</h2>
+                            <p className="text-sm text-gray-600 mt-2">
+                              We've sent a 6-digit OTP to<br />
+                              <span className="font-semibold text-gray-900">{otpEmail}</span>
+                            </p>
+                          </div>
+                        </div>
+
+                        <form onSubmit={handleOTPVerification} className="space-y-4 flex-1">
+                          {/* OTP Input */}
+                          <div className="space-y-2">
+                            <label className="block text-sm font-semibold text-gray-900">
+                              Enter OTP Code
+                            </label>
+                            <input
+                              type="text"
+                              placeholder="000000"
+                              value={otpCode}
+                              onChange={(e) => {
+                                const value = e.target.value.replace(/\D/g, '').slice(0, 6);
+                                setOtpCode(value);
+                              }}
+                              maxLength={6}
+                              className="w-full text-center text-2xl font-bold tracking-widest px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 bg-gray-50/50 transition-all"
+                              required
+                            />
+                            <p className="text-xs text-gray-600 text-center">The OTP expires in 5 minutes</p>
+                          </div>
+
+                          {/* Verify Button */}
+                          <button
+                            type="submit"
+                            disabled={isVerifyingOTP || otpCode.length !== 6}
+                            className="w-full mt-4 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed text-white font-bold py-3 px-6 rounded-lg flex items-center justify-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl"
+                          >
+                            {isVerifyingOTP ? (
+                              <>
+                                <Loader className="h-5 w-5 animate-spin" />
+                                Verifying...
+                              </>
+                            ) : (
+                              <>
+                                Verify OTP
+                                <ArrowRight className="h-5 w-5" />
+                              </>
+                            )}
+                          </button>
+                        </form>
+
+                        {/* Resend OTP */}
+                        <div className="text-center space-y-3 pt-4 border-t border-gray-200">
+                          <p className="text-sm text-gray-600">
+                            Didn't receive the code?
+                          </p>
+                          <button
+                            type="button"
+                            onClick={handleResendOTP}
+                            disabled={isSendingOTP}
+                            className="text-sm text-orange-600 hover:text-orange-700 font-semibold transition-colors disabled:text-gray-400"
+                          >
+                            {isSendingOTP ? "Sending..." : "Resend OTP"}
+                          </button>
+                        </div>
+
+                        {/* Back Button */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowOTPVerification(false);
+                            setOtpCode("");
+                            setOtpEmail("");
+                            setIsPasswordResetOTPVerified(false);
+                            setResetPassword("");
+                            setConfirmResetPassword("");
+                          }}
+                          className="w-full mt-2 border-2 border-gray-200 text-gray-700 font-semibold py-2.5 px-4 rounded-lg hover:border-orange-200 hover:bg-orange-50/30 transition-all duration-200"
+                        >
+                          Back
+                        </button>
+                      </>
+                    ) : (
+                      // Password Reset Form
+                      <>
+                        <div>
+                          <h3 className="text-lg font-bold text-gray-900 mb-1">Set New Password</h3>
+                          <p className="text-sm text-gray-600">Create a strong password to secure your account</p>
+                        </div>
+
+                        <form onSubmit={handlePasswordResetSubmit} className="space-y-4 flex-1">
+                          {/* New Password Field */}
+                          <div className="space-y-2">
+                            <label className="block text-sm font-semibold text-gray-900">
+                              New Password
+                            </label>
+                            <div className="relative group">
+                              <Lock className="absolute left-3.5 top-3.5 h-5 w-5 text-gray-400 group-focus-within:text-orange-500 transition-colors" />
+                              <Input
+                                type={showResetPassword ? "text" : "password"}
+                                placeholder="••••••••"
+                                value={resetPassword}
+                                onChange={(e) => setResetPassword(e.target.value)}
+                                onFocus={() => setIsPasswordFieldFocused(true)}
+                                onBlur={() => setIsPasswordFieldFocused(false)}
+                                className="w-full pl-11 pr-12 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 bg-gray-50/50 transition-all"
+                                required
+                              />
+                              <button
+                                type="button"
+                                onClick={() => setShowResetPassword(!showResetPassword)}
+                                className="absolute right-3.5 top-3.5 text-gray-400 hover:text-gray-600 transition-colors"
+                              >
+                                {showResetPassword ? (
+                                  <EyeOff className="h-5 w-5" />
+                                ) : (
+                                  <Eye className="h-5 w-5" />
+                                )}
+                              </button>
+                            </div>
+
+                            {/* Password Requirements */}
+                            {resetPassword && isPasswordFieldFocused && (
+                              <div className="mt-3 p-3 bg-gray-50 rounded-lg space-y-2">
+                                <p className="text-xs font-semibold text-gray-900">Password Requirements:</p>
+                                <div className="space-y-1.5 text-xs">
+                                  <div className={`flex items-center gap-2 ${validatePassword(resetPassword).requirements.length ? 'text-green-600' : 'text-gray-600'}`}>
+                                    <div className={`w-4 h-4 rounded-full flex items-center justify-center ${validatePassword(resetPassword).requirements.length ? 'bg-green-100' : 'bg-gray-200'}`}>
+                                      {validatePassword(resetPassword).requirements.length && <span className="text-green-600 font-bold">✓</span>}
+                                    </div>
+                                    <span>At least 6 characters</span>
+                                  </div>
+                                  <div className={`flex items-center gap-2 ${validatePassword(resetPassword).requirements.uppercase ? 'text-green-600' : 'text-gray-600'}`}>
+                                    <div className={`w-4 h-4 rounded-full flex items-center justify-center ${validatePassword(resetPassword).requirements.uppercase ? 'bg-green-100' : 'bg-gray-200'}`}>
+                                      {validatePassword(resetPassword).requirements.uppercase && <span className="text-green-600 font-bold">✓</span>}
+                                    </div>
+                                    <span>At least 1 uppercase letter (A-Z)</span>
+                                  </div>
+                                  <div className={`flex items-center gap-2 ${validatePassword(resetPassword).requirements.lowercase ? 'text-green-600' : 'text-gray-600'}`}>
+                                    <div className={`w-4 h-4 rounded-full flex items-center justify-center ${validatePassword(resetPassword).requirements.lowercase ? 'bg-green-100' : 'bg-gray-200'}`}>
+                                      {validatePassword(resetPassword).requirements.lowercase && <span className="text-green-600 font-bold">✓</span>}
+                                    </div>
+                                    <span>At least 1 lowercase letter (a-z)</span>
+                                  </div>
+                                  <div className={`flex items-center gap-2 ${validatePassword(resetPassword).requirements.number ? 'text-green-600' : 'text-gray-600'}`}>
+                                    <div className={`w-4 h-4 rounded-full flex items-center justify-center ${validatePassword(resetPassword).requirements.number ? 'bg-green-100' : 'bg-gray-200'}`}>
+                                      {validatePassword(resetPassword).requirements.number && <span className="text-green-600 font-bold">✓</span>}
+                                    </div>
+                                    <span>At least 1 number (0-9)</span>
+                                  </div>
+                                  <div className={`flex items-center gap-2 ${validatePassword(resetPassword).requirements.special ? 'text-green-600' : 'text-gray-600'}`}>
+                                    <div className={`w-4 h-4 rounded-full flex items-center justify-center ${validatePassword(resetPassword).requirements.special ? 'bg-green-100' : 'bg-gray-200'}`}>
+                                      {validatePassword(resetPassword).requirements.special && <span className="text-green-600 font-bold">✓</span>}
+                                    </div>
+                                    <span>At least 1 special character (!@#$%^&*)</span>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Confirm Password Field */}
+                          <div className="space-y-2">
+                            <label className="block text-sm font-semibold text-gray-900">
+                              Confirm Password
+                            </label>
+                            <div className="relative group">
+                              <Lock className="absolute left-3.5 top-3.5 h-5 w-5 text-gray-400 group-focus-within:text-orange-500 transition-colors" />
+                              <Input
+                                type={showConfirmResetPassword ? "text" : "password"}
+                                placeholder="••••••••"
+                                value={confirmResetPassword}
+                                onChange={(e) => setConfirmResetPassword(e.target.value)}
+                                className={`w-full pl-11 pr-12 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20 bg-gray-50/50 transition-all ${
+                                  confirmResetPassword && resetPassword !== confirmResetPassword ? 'border-red-400 focus:border-red-500' : 'border-gray-200 focus:border-orange-500'
+                                }`}
+                                required
+                              />
+                              <button
+                                type="button"
+                                onClick={() => setShowConfirmResetPassword(!showConfirmResetPassword)}
+                                className="absolute right-3.5 top-3.5 text-gray-400 hover:text-gray-600 transition-colors"
+                              >
+                                {showConfirmResetPassword ? (
+                                  <EyeOff className="h-5 w-5" />
+                                ) : (
+                                  <Eye className="h-5 w-5" />
+                                )}
+                              </button>
+                            </div>
+                            {confirmResetPassword && resetPassword !== confirmResetPassword && (
+                              <p className="text-xs text-red-500 font-medium">Passwords do not match</p>
+                            )}
+                            {confirmResetPassword && resetPassword === confirmResetPassword && (
+                              <p className="text-xs text-green-600 font-medium flex items-center gap-1">
+                                <span>✓</span> Passwords match
+                              </p>
+                            )}
+                          </div>
+
+                          {/* Submit Button */}
+                          <button
+                            type="submit"
+                            disabled={isResettingPassword || !resetPassword || !confirmResetPassword || resetPassword !== confirmResetPassword || !validatePassword(resetPassword).isValid}
+                            className="w-full mt-4 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed text-white font-bold py-3 px-6 rounded-lg flex items-center justify-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl"
+                          >
+                            {isResettingPassword ? (
+                              <>
+                                <Loader className="h-5 w-5 animate-spin" />
+                                Resetting...
+                              </>
+                            ) : (
+                              <>
+                                Submit
+                                <ArrowRight className="h-5 w-5" />
+                              </>
+                            )}
+                          </button>
+                        </form>
+                      </>
                     )}
-                  </div>
-
-                  {/* Continue Button */}
-                  <button
-                    type="submit"
-                    className="w-full mt-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-3 px-6 rounded-lg flex items-center justify-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl"
-                  >
-                    Continue
-                  </button>
-                </form>
-
-                {/* Return to Login */}
-                <div className="text-center pt-2">
-                  <button
-                    type="button"
-                    onClick={returnToLogin}
-                    className="text-sm text-orange-600 hover:text-orange-700 font-semibold transition-colors"
-                  >
-                    Return to Log in
-                  </button>
-                </div>
-
-                {/* Divider */}
-                <div className="relative flex items-center gap-3 py-1">
-                  <div className="flex-1 border-t border-gray-200"></div>
-                </div>
-
-                {/* Trust Section */}
-                <div className="mt-6 pt-5 border-t border-gray-100">
-                  <p className="text-xs font-bold text-gray-900 uppercase tracking-wider mb-3">
-                    🏆 Book With Confidence
-                  </p>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-gradient-to-br from-green-50 to-green-50/50 p-3 rounded-lg border border-green-100">
-                      <div className="text-lg font-bold text-green-600">4.8</div>
-                      <p className="text-xs text-gray-600 mt-1">2.5K+ Reviews</p>
-                    </div>
-                    <div className="bg-gradient-to-br from-blue-50 to-blue-50/50 p-3 rounded-lg border border-blue-100">
-                      <div className="text-lg font-bold text-blue-600">4.6</div>
-                      <p className="text-xs text-gray-600 mt-1">15K+ Bookings</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Terms Text */}
-                <p className="text-xs text-gray-500 text-center mt-4">
-                  By continuing, you agree to StoriesByFoot's{" "}
-                  <a href="/terms-and-condition" className="text-orange-600 hover:underline">
-                    Terms & Conditions
-                  </a>
-                  {" "}and{" "}
-                  <a href="/privacy-policy" className="text-orange-600 hover:underline">
-                    Privacy Policy
-                  </a>
-                </p>
+                  </>
+                )}
               </div>
             )}
           </div>

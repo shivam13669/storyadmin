@@ -178,11 +178,7 @@ const Navigation = () => {
               <div className="px-3 py-2 space-y-2">
                 <div className="flex items-center gap-2">
                   <CurrencyPicker value={currency} onChange={setCurrencyWithRegion} className="flex-1" />
-                  {isAuthenticated && user ? (
-                    <div className="text-white/90 text-sm font-medium px-2 py-1">
-                      Hi, {getFirstName(user.fullName)}
-                    </div>
-                  ) : (
+                  {!isAuthenticated && user === null && (
                     <button
                       onClick={() => {
                         setIsLoginModalOpen(true);

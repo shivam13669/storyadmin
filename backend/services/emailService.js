@@ -1,8 +1,10 @@
 import nodemailer from 'nodemailer';
 
-// Create transporter using Gmail SMTP
+// Create transporter using Zoho SMTP
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: 'smtp.zoho.com',
+  port: 587,
+  secure: false, // Use STARTTLS instead of SSL
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,

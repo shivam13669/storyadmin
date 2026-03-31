@@ -36,7 +36,7 @@ const SupportPage = () => {
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground text-sm">
-                  Send us an email at support@storiesbyfoot.com and we'll get back to you within 24 hours.
+                  Send us an email at contact@storiesbyfoot.com and we'll get back to you within 24 hours.
                 </p>
               </CardContent>
             </Card>

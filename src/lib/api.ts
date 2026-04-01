@@ -461,10 +461,20 @@ export async function changeUserPassword(
   newPassword: string
 ): Promise<void> {
   try {
+    // Get userId from localStorage (set during login)
+    const userStr = localStorage.getItem('user');
+    const user = userStr ? JSON.parse(userStr) : null;
+    const userId = user?.id;
+
+    if (!userId) {
+      throw new Error('User not authenticated');
+    }
+
     const response = await fetch(`${API_URL}/auth/change-password`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'userId': userId.toString(),
       },
       body: JSON.stringify({ oldPassword, newPassword }),
     });

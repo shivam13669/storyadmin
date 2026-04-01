@@ -184,7 +184,7 @@ export function ChangePasswordModal({
             )}
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2" onMouseDown={() => setIsNewPasswordFocused(false)}>
             <Label htmlFor="confirmPassword">Confirm New Password</Label>
             <Input
               id="confirmPassword"

@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
-import { useCurrency } from "@/context/CurrencyContext";
 
 interface ConfirmationStepProps {
   formData: BookingFormData;
@@ -41,7 +40,6 @@ const ConfirmationStep = ({
   onCouponCodeChange,
   couponValidating = false,
 }: ConfirmationStepProps) => {
-  const { formatPrice } = useCurrency();
   const travelDateObj = new Date(formData.travelDate);
   const formattedDate = travelDateObj.toLocaleDateString("en-IN", {
     day: "numeric",
@@ -196,7 +194,7 @@ const ConfirmationStep = ({
                     <p className="text-sm font-semibold text-green-900">Coupon Applied</p>
                     <p className="text-lg font-bold text-green-700 mt-1">{appliedCoupon.code}</p>
                     <p className="text-sm text-green-600 mt-1">
-                      Discount: {formatPrice(discountAmount, { fromCurrency: "INR" })}
+                      Discount: ₹{discountAmount.toLocaleString("en-IN")}
                     </p>
                   </div>
                   <Button
@@ -245,7 +243,7 @@ const ConfirmationStep = ({
               <div className="flex justify-between items-center pb-3 border-b border-gray-200">
                 <span className="text-gray-700">Base Price (per person)</span>
                 <span className="font-semibold text-gray-900">
-                  {formatPrice(Math.round(parseInt(travelPackage.price.replace(/\D/g, ""))), { fromCurrency: "INR" })}
+                  ₹{Math.round(parseInt(travelPackage.price.replace(/\D/g, ""))).toLocaleString("en-IN")}
                 </span>
               </div>
 
@@ -254,9 +252,9 @@ const ConfirmationStep = ({
                   Co-Travelers ({formData.guests.length} {formData.guests.length === 1 ? 'person' : 'people'})
                 </span>
                 <span className="font-semibold text-gray-900">
-                  {formData.guests.length > 0 ? `+${formatPrice(Math.round(
+                  {formData.guests.length > 0 ? `+₹${Math.round(
                     parseInt(travelPackage.price.replace(/\D/g, "")) * formData.guests.length
-                  ), { fromCurrency: "INR" })}` : formatPrice(0, { fromCurrency: "INR" })}
+                  ).toLocaleString("en-IN")}` : '₹0'}
                 </span>
               </div>
 
@@ -266,10 +264,10 @@ const ConfirmationStep = ({
                     {selectedBike.name} Upgrade ({Math.round((selectedBike.priceMultiplier - 1) * 100)}%)
                   </span>
                   <span className="font-semibold text-gray-900">
-                    +{formatPrice(Math.round(
+                    +₹{Math.round(
                       parseInt(travelPackage.price.replace(/\D/g, "")) *
                         (selectedBike.priceMultiplier - 1) * (1 + formData.guests.length)
-                    ), { fromCurrency: "INR" })}
+                    ).toLocaleString("en-IN")}
                   </span>
                 </div>
               )}
@@ -280,7 +278,7 @@ const ConfirmationStep = ({
                     Discount ({appliedCoupon.code})
                   </span>
                   <span className="font-semibold text-green-600">
-                    -{formatPrice(discountAmount, { fromCurrency: "INR" })}
+                    -₹{discountAmount.toLocaleString("en-IN")}
                   </span>
                 </div>
               )}
@@ -288,7 +286,7 @@ const ConfirmationStep = ({
               <div className="flex justify-between items-center pt-3">
                 <span className="text-lg font-bold text-gray-900">Total Price</span>
                 <span className={`text-3xl font-bold ${appliedCoupon ? "text-green-600" : "text-blue-600"}`}>
-                  {formatPrice(finalPrice, { fromCurrency: "INR" })}
+                  ₹{finalPrice.toLocaleString("en-IN")}
                 </span>
               </div>
             </div>

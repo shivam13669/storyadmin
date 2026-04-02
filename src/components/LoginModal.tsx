@@ -846,6 +846,7 @@ export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
                           />
                           <button
                             type="button"
+                            onMouseDown={(e) => e.preventDefault()}
                             onClick={() => setShowSignupPassword(!showSignupPassword)}
                             className="absolute right-3.5 top-3.5 text-gray-400 hover:text-gray-600 transition-colors"
                           >

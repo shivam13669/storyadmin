@@ -151,7 +151,10 @@ export function ChangePasswordModal({
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
+          <div className="space-y-2" onMouseDown={(e) => {
+            if (e.target.closest('button')) return;
+            setIsNewPasswordFocused(false);
+          }}>
             <Label htmlFor="oldPassword">Old Password</Label>
             <div className="relative">
               <Input

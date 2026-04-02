@@ -178,13 +178,44 @@ export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
     country.code.toLowerCase().includes(countrySearch.toLowerCase())
   );
 
-  // Reset to login tab and clear all view states when modal opens
+  // Reset to login tab and clear all view states when modal opens/closes
   useEffect(() => {
     if (isOpen) {
+      // When modal opens: reset to login tab and clear view states
       setActiveTab('login');
       setShowForgotPassword(false);
       setShowOTPVerification(false);
       setIsPasswordResetOTPVerified(false);
+    } else {
+      // When modal closes: clear all form data
+      setEmail("");
+      setPassword("");
+      setSignupEmail("");
+      setSignupPassword("");
+      setConfirmPassword("");
+      setFullName("");
+      setMobileNumber("");
+      setSelectedCountry(COUNTRIES[0]);
+      setCountrySearch("");
+      setAgreeTerms(false);
+      setEmailError("");
+      setSignupEmailError("");
+      setMobileNumberError("");
+      setForgotPasswordEmail("");
+      setForgotPasswordEmailError("");
+      setOtpCode("");
+      setOtpEmail("");
+      setSignupFormData(null);
+      setResetPassword("");
+      setConfirmResetPassword("");
+      setShowPassword(false);
+      setShowSignupPassword(false);
+      setShowConfirmPassword(false);
+      setShowResetPassword(false);
+      setShowConfirmResetPassword(false);
+      setShowOTPVerification(false);
+      setIsPasswordResetOTPVerified(false);
+      setOpenCountryPopover(false);
     }
   }, [isOpen]);
 

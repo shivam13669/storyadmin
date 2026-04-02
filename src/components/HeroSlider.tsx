@@ -1,5 +1,5 @@
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay, Pagination, Loop } from "swiper/modules";
+import { Autoplay, Pagination } from "swiper/modules";
 import { Link } from "react-router-dom";
 import "swiper/css";
 import "swiper/css/pagination";
@@ -29,7 +29,7 @@ const HeroSlider = () => {
   return (
     <section className="relative w-full pt-16">
       <Swiper
-        modules={[Autoplay, Pagination, Loop]}
+        modules={[Autoplay, Pagination]}
         direction="vertical"
         loop={true}
         autoplay={{

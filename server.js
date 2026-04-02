@@ -19,7 +19,7 @@ const PORT = parseInt(process.env.PORT || (process.env.NODE_ENV === 'production'
 // Middleware
 app.use(cors({
   origin: '*', // Allow all origins (you can restrict this later)
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'userId'],
   credentials: false
 }));

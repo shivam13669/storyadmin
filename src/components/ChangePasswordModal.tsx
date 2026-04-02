@@ -165,6 +165,7 @@ export function ChangePasswordModal({
                 value={oldPassword}
                 onChange={(e) => setOldPassword(e.target.value)}
                 disabled={loading}
+                tabIndex={1}
               />
               <button
                 type="button"
@@ -174,6 +175,7 @@ export function ChangePasswordModal({
                 }}
                 className="absolute right-3.5 top-3.5 text-gray-400 hover:text-gray-600 transition-colors"
                 disabled={loading}
+                tabIndex={2}
               >
                 {showOldPassword ? (
                   <EyeOff className="h-5 w-5" />
@@ -197,6 +199,7 @@ export function ChangePasswordModal({
                 onFocus={() => setIsNewPasswordFocused(true)}
                 onBlur={() => setIsNewPasswordFocused(false)}
                 disabled={loading}
+                tabIndex={3}
               />
               <button
                 type="button"
@@ -206,6 +209,7 @@ export function ChangePasswordModal({
                 }}
                 className="absolute right-3.5 top-3.5 text-gray-400 hover:text-gray-600 transition-colors"
                 disabled={loading}
+                tabIndex={4}
               >
                 {showNewPassword ? (
                   <EyeOff className="h-5 w-5" />
@@ -267,6 +271,7 @@ export function ChangePasswordModal({
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 disabled={loading}
+                tabIndex={5}
               />
               <button
                 type="button"
@@ -276,6 +281,7 @@ export function ChangePasswordModal({
                 }}
                 className="absolute right-3.5 top-3.5 text-gray-400 hover:text-gray-600 transition-colors"
                 disabled={loading}
+                tabIndex={6}
               >
                 {showConfirmPassword ? (
                   <EyeOff className="h-5 w-5" />
@@ -292,10 +298,11 @@ export function ChangePasswordModal({
               variant="outline"
               onClick={onClose}
               disabled={loading || success}
+              tabIndex={7}
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={loading || success}>
+            <Button type="submit" disabled={loading || success} tabIndex={8}>
               {loading ? "Updating..." : "Change Password"}
             </Button>
           </div>

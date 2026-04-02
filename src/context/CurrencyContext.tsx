@@ -245,6 +245,8 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
         const inferredRegion = getRegionFromCurrency(code);
         if (inferredRegion) {
           saveRegionPreference(inferredRegion);
+          // Update the detected region state immediately so UI reflects the change
+          setDetectedRegion(inferredRegion);
           console.log(`[CURRENCY] Selected ${code}, inferred region: ${inferredRegion}`);
         } else {
           console.log(`[CURRENCY] Selected ${code}, but region inference failed`);

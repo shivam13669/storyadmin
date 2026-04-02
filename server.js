@@ -91,7 +91,7 @@ app.get('/api/region', (req, res) => {
   }
 
   // If no detection succeeded, return null
-  // Client will treat this as unknown region and apply 20% markup as safety measure
+  // Client will treat this as unknown region and apply 50% markup as safety measure
   console.log('[REGION] Could not detect region, returning null');
   res.json({ region: null });
 });

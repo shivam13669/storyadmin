@@ -4,25 +4,25 @@ const Team = () => {
       name: "Diana Robinson",
       position: "Founder, Owner",
       phone: "+1 323-913-4688",
-      image: "/images/user-1-118x118.jpg"
+      image: "https://raw.githubusercontent.com/shivam13669/cliffhanger2/main/images/user-1-118x118.jpg"
     },
     {
       name: "Peter McMillan",
       position: "Travel Agent",
       phone: "+1 323-913-4688",
-      image: "/images/user-2-118x118.jpg"
+      image: "https://raw.githubusercontent.com/shivam13669/cliffhanger2/main/images/user-2-118x118.jpg"
     },
     {
       name: "Jill Peterson",
       position: "Tour Consultant",
       phone: "+1 323-913-4688",
-      image: "/images/user-3-118x118.jpg"
+      image: "https://raw.githubusercontent.com/shivam13669/cliffhanger2/main/images/user-3-118x118.jpg"
     },
     {
       name: "James Smith",
       position: "PR Manager",
       phone: "+1 323-913-4688",
-      image: "/images/user-4-118x118.jpg"
+      image: "https://raw.githubusercontent.com/shivam13669/cliffhanger2/main/images/user-4-118x118.jpg"
     }
   ];
 

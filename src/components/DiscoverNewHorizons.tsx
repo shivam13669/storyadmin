@@ -29,7 +29,7 @@ const DiscoverNewHorizons = () => {
           {/* Left: Image */}
           <div className="flex justify-center animate-fade-in">
             <img
-              src="/images/index-3-556x382.jpg"
+              src="https://raw.githubusercontent.com/shivam13669/cliffhanger2/main/images/index-3-556x382.jpg"
               alt="Discover New Horizons"
               className="rounded-lg shadow-lg max-w-md w-full"
             />

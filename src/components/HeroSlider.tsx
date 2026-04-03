@@ -7,19 +7,19 @@ import "swiper/css/pagination";
 const HeroSlider = () => {
   const slides = [
     {
-      image: "/images/slider-4-slide-1-1920x678.jpg",
+      image: "https://raw.githubusercontent.com/shivam13669/cliffhanger2/main/images/slider-4-slide-1-1920x678.jpg",
       subtitle: "Enjoy the Best Destinations with Our Travel Agency",
       title: "Explore The World",
       cta: "Get in touch"
     },
     {
-      image: "/images/slider-4-slide-2-1920x678.jpg",
+      image: "https://raw.githubusercontent.com/shivam13669/cliffhanger2/main/images/slider-4-slide-2-1920x678.jpg",
       subtitle: "A team of professional Travel Experts",
       title: "Trust Our Experience",
       cta: "Get in touch"
     },
     {
-      image: "/images/slider-4-slide-3-1920x678.jpg",
+      image: "https://raw.githubusercontent.com/shivam13669/cliffhanger2/main/images/slider-4-slide-3-1920x678.jpg",
       subtitle: "Build your Next Holiday Trip with Us",
       title: "Create Your Tour",
       cta: "Get in touch"

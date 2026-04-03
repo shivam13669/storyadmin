@@ -2,15 +2,15 @@ const CategoryBoxes = () => {
   const categories = [
     {
       title: "Balloon Flights",
-      image: "/images/cta-1-368x420.jpg"
+      image: "https://raw.githubusercontent.com/shivam13669/cliffhanger2/main/images/cta-1-368x420.jpg"
     },
     {
       title: "Mountain Holiday",
-      image: "/images/cta-2-368x420.jpg"
+      image: "https://raw.githubusercontent.com/shivam13669/cliffhanger2/main/images/cta-2-368x420.jpg"
     },
     {
       title: "Beach Holidays",
-      image: "/images/cta-3-368x420.jpg"
+      image: "https://raw.githubusercontent.com/shivam13669/cliffhanger2/main/images/cta-3-368x420.jpg"
     }
   ];
 

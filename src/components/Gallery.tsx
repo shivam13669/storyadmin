@@ -11,32 +11,32 @@ const Gallery = () => {
 
   const galleryImages = [
     {
-      thumb: "/images/gallery-image-1-270x195.jpg",
-      full: "/images/gallery-image-1-270x195.jpg"
+      thumb: "https://raw.githubusercontent.com/shivam13669/cliffhanger2/main/images/gallery-image-1-270x195.jpg",
+      full: "https://raw.githubusercontent.com/shivam13669/cliffhanger2/main/images/gallery-image-1-270x195.jpg"
     },
     {
-      thumb: "/images/gallery-image-2-270x195.jpg",
-      full: "/images/gallery-image-2-270x195.jpg"
+      thumb: "https://raw.githubusercontent.com/shivam13669/cliffhanger2/main/images/gallery-image-2-270x195.jpg",
+      full: "https://raw.githubusercontent.com/shivam13669/cliffhanger2/main/images/gallery-image-2-270x195.jpg"
     },
     {
-      thumb: "/images/gallery-image-3-270x195.jpg",
-      full: "/images/gallery-image-3-270x195.jpg"
+      thumb: "https://raw.githubusercontent.com/shivam13669/cliffhanger2/main/images/gallery-image-3-270x195.jpg",
+      full: "https://raw.githubusercontent.com/shivam13669/cliffhanger2/main/images/gallery-image-3-270x195.jpg"
     },
     {
-      thumb: "/images/gallery-image-4-270x195.jpg",
-      full: "/images/gallery-image-4-270x195.jpg"
+      thumb: "https://raw.githubusercontent.com/shivam13669/cliffhanger2/main/images/gallery-image-4-270x195.jpg",
+      full: "https://raw.githubusercontent.com/shivam13669/cliffhanger2/main/images/gallery-image-4-270x195.jpg"
     },
     {
-      thumb: "/images/gallery-image-5-270x195.jpg",
-      full: "/images/gallery-image-5-270x195.jpg"
+      thumb: "https://raw.githubusercontent.com/shivam13669/cliffhanger2/main/images/gallery-image-5-270x195.jpg",
+      full: "https://raw.githubusercontent.com/shivam13669/cliffhanger2/main/images/gallery-image-5-270x195.jpg"
     },
     {
-      thumb: "/images/gallery-image-6-270x195.jpg",
-      full: "/images/gallery-image-6-270x195.jpg"
+      thumb: "https://raw.githubusercontent.com/shivam13669/cliffhanger2/main/images/gallery-image-6-270x195.jpg",
+      full: "https://raw.githubusercontent.com/shivam13669/cliffhanger2/main/images/gallery-image-6-270x195.jpg"
     },
     {
-      thumb: "/images/gallery-image-7-270x195.jpg",
-      full: "/images/gallery-image-7-270x195.jpg"
+      thumb: "https://raw.githubusercontent.com/shivam13669/cliffhanger2/main/images/gallery-image-7-270x195.jpg",
+      full: "https://raw.githubusercontent.com/shivam13669/cliffhanger2/main/images/gallery-image-7-270x195.jpg"
     }
   ];
 

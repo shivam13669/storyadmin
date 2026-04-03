@@ -176,8 +176,8 @@ const Dashboard = () => {
   };
 
   const openPhoneEditor = () => {
-    const currentCountry = COUNTRIES.find((country) => country.code === user?.countryCode) || COUNTRIES[0];
-    setSelectedPhoneCountry(currentCountry);
+    const indiaCountry = COUNTRIES.find((country) => country.code === 'IN') || COUNTRIES[0];
+    setSelectedPhoneCountry(indiaCountry);
     setPhoneNumber(isGooglePlaceholderPhone(user?.mobileNumber) ? "" : user?.mobileNumber || "");
     setPhoneCountrySearch("");
     setOpenPhoneCountryPopover(false);

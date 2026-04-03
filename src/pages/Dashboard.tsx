@@ -266,8 +266,9 @@ const Dashboard = () => {
         throw new Error("User not authenticated");
       }
 
-      // Call API to update phone number
+      // Call API to update phone number (include fullName for backend validation)
       await updateUser(user.id, {
+        fullName: user.fullName,
         mobileNumber: editedPhone,
         countryCode: selectedCountry.code
       });

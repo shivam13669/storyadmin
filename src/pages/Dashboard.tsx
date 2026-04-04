@@ -57,6 +57,33 @@ const countryCodeToPhoneCode: { [key: string]: string } = {
   'BD': '880',  // Bangladesh
 };
 
+const COUNTRY_DIGIT_REQUIREMENTS: Record<string, { min: number; max: number }> = {
+  IN: { min: 10, max: 10 },
+  US: { min: 10, max: 10 },
+  GB: { min: 10, max: 11 },
+  CA: { min: 10, max: 10 },
+  AU: { min: 9, max: 9 },
+  DE: { min: 10, max: 11 },
+  FR: { min: 9, max: 9 },
+  IT: { min: 10, max: 10 },
+  ES: { min: 9, max: 9 },
+  JP: { min: 10, max: 11 },
+  CN: { min: 11, max: 11 },
+  SG: { min: 8, max: 8 },
+  MY: { min: 9, max: 10 },
+  TH: { min: 9, max: 10 },
+  PH: { min: 10, max: 10 },
+  ID: { min: 9, max: 12 },
+  SL: { min: 9, max: 9 },
+  NP: { min: 10, max: 10 },
+  BR: { min: 10, max: 11 },
+  MX: { min: 10, max: 10 },
+  ZA: { min: 10, max: 10 },
+  HK: { min: 8, max: 8 },
+  PK: { min: 10, max: 10 },
+  BD: { min: 10, max: 10 },
+};
+
 const COUNTRIES = [
   { code: 'IN', name: 'India', dial: '+91' },
   { code: 'US', name: 'United States', dial: '+1' },
@@ -1287,10 +1314,6 @@ const Dashboard = () => {
                       </p>
                     </div>
 
-                    {/* Note */}
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                      <p className="text-xs text-blue-800">Required for GST purpose on your tax invoice</p>
-                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -1390,7 +1413,12 @@ const Dashboard = () => {
                             <Input
                               type="tel"
                               value={phoneNumber}
-                              onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ""))}
+                              onChange={(e) => {
+                                const digitsOnly = e.target.value.replace(/\D/g, "");
+                                const maxDigits = COUNTRY_DIGIT_REQUIREMENTS[selectedPhoneCountry.code]?.max || 15;
+                                const truncated = digitsOnly.slice(0, maxDigits);
+                                setPhoneNumber(truncated);
+                              }}
                               placeholder="Enter phone number"
                               className="flex-1 px-3 py-2.5 border border-gray-200 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all h-auto"
                             />

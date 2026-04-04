@@ -118,6 +118,9 @@ const Dashboard = () => {
   const [selectedCountry, setSelectedCountry] = useState("");
   const [countrySearch, setCountrySearch] = useState("");
   const [openCountryPopover, setOpenCountryPopover] = useState(false);
+  const [selectedNationality, setSelectedNationality] = useState("");
+  const [nationalitySearch, setNationalitySearch] = useState("");
+  const [openNationalityPopover, setOpenNationalityPopover] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
 
   // Redirect if not authenticated or if admin (admin should go to admin dashboard)
@@ -944,10 +947,68 @@ const Dashboard = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
                         <label className="text-sm font-semibold text-gray-900 uppercase tracking-wide">Nationality</label>
-                        <button className="w-full mt-2 px-3 py-2.5 border border-gray-200 rounded-lg bg-white hover:bg-gray-50 text-left text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all flex items-center justify-between">
-                          <span>Select Nationality</span>
-                          <ChevronDown className="h-5 w-5 text-gray-600 flex-shrink-0" />
-                        </button>
+                        <Popover open={openNationalityPopover} onOpenChange={(open) => {
+                          setOpenNationalityPopover(open);
+                          if (!open) setNationalitySearch("");
+                        }}>
+                          <PopoverTrigger asChild>
+                            <button
+                              type="button"
+                              className="w-full mt-2 px-3 py-2.5 border border-gray-200 rounded-lg bg-white hover:bg-gray-50 text-left text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all flex items-center justify-between"
+                            >
+                              <span>{selectedNationality || "Select Nationality"}</span>
+                              <ChevronDown className="h-5 w-5 text-gray-600 flex-shrink-0" />
+                            </button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-[--radix-popover-trigger-width] p-0 z-50" align="start">
+                            <div className="flex flex-col bg-white rounded-lg overflow-hidden shadow-lg">
+                              <div className="sticky top-0 z-10 p-4 border-b border-gray-200 bg-white">
+                                <div className="relative">
+                                  <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-600" />
+                                  <input
+                                    type="text"
+                                    placeholder="Search countries..."
+                                    value={nationalitySearch}
+                                    onChange={(e) => setNationalitySearch(e.target.value)}
+                                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white transition-all"
+                                    autoFocus
+                                  />
+                                </div>
+                              </div>
+                              <div className="max-h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                                {countries
+                                  .filter((c) => c.name.toLowerCase().includes(nationalitySearch.toLowerCase()))
+                                  .length > 0 ? (
+                                  countries
+                                    .filter((c) => c.name.toLowerCase().includes(nationalitySearch.toLowerCase()))
+                                    .map((country) => (
+                                      <button
+                                        key={country.code}
+                                        type="button"
+                                        onClick={() => {
+                                          setSelectedNationality(country.name);
+                                          setOpenNationalityPopover(false);
+                                          setNationalitySearch("");
+                                        }}
+                                        className={`w-full text-left px-4 py-3 text-sm transition-colors flex items-center justify-between group ${
+                                          selectedNationality === country.name
+                                            ? "bg-blue-50 text-gray-900 font-semibold border-l-3 border-blue-500"
+                                            : "text-gray-700 hover:bg-blue-50 border-l-3 border-transparent"
+                                        }`}
+                                      >
+                                        <span>{country.name}</span>
+                                        {selectedNationality === country.name && (
+                                          <span className="text-blue-600 font-bold">✓</span>
+                                        )}
+                                      </button>
+                                    ))
+                                ) : (
+                                  <div className="px-4 py-8 text-sm text-gray-500 text-center">No countries found</div>
+                                )}
+                              </div>
+                            </div>
+                          </PopoverContent>
+                        </Popover>
                       </div>
                       <div></div>
                     </div>

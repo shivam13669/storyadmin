@@ -817,26 +817,16 @@ const Dashboard = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-6">
-                    {/* First & Middle Name and Last Name */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
-                        <label className="text-sm font-semibold text-gray-900 uppercase tracking-wide">First & Middle Name</label>
-                        <Input
-                          type="text"
-                          value={editedName}
-                          onChange={(e) => setEditedName(e.target.value)}
-                          placeholder="Enter first & middle name"
-                          className="mt-2"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-sm font-semibold text-gray-900 uppercase tracking-wide">Last Name</label>
-                        <Input
-                          type="text"
-                          placeholder="Enter last name"
-                          className="mt-2"
-                        />
-                      </div>
+                    {/* Full Name */}
+                    <div>
+                      <label className="text-sm font-semibold text-gray-900 uppercase tracking-wide">Full Name</label>
+                      <Input
+                        type="text"
+                        value={editedName}
+                        onChange={(e) => setEditedName(e.target.value)}
+                        placeholder="Enter your full name"
+                        className="mt-2"
+                      />
                     </div>
 
                     {/* Gender and Date of Birth */}

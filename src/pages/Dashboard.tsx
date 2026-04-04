@@ -1314,10 +1314,6 @@ const Dashboard = () => {
                       </p>
                     </div>
 
-                    {/* Note */}
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                      <p className="text-xs text-blue-800">Required for GST purpose on your tax invoice</p>
-                    </div>
                   </div>
                 </CardContent>
               </Card>

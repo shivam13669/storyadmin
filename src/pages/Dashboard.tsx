@@ -949,21 +949,21 @@ const Dashboard = () => {
                             </button>
                           </PopoverTrigger>
                           <PopoverContent className="w-96 p-0" align="start">
-                            <div className="flex flex-col">
-                              <div className="sticky top-0 z-10 p-3 border-b border-gray-200 bg-white">
+                            <div className="flex flex-col bg-white rounded-lg overflow-hidden">
+                              <div className="sticky top-0 z-10 p-4 border-b border-gray-200 bg-white">
                                 <div className="relative">
-                                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                  <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                                   <input
                                     type="text"
-                                    placeholder="Search..."
+                                    placeholder="Search states..."
                                     value={stateSearch}
                                     onChange={(e) => setStateSearch(e.target.value)}
-                                    className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white"
+                                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white transition-all"
                                     autoFocus
                                   />
                                 </div>
                               </div>
-                              <div className="max-h-64 overflow-y-auto">
+                              <div className="max-h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
                                 {statesAndDistricts.states
                                   .filter((s) => s.state.toLowerCase().includes(stateSearch.toLowerCase()))
                                   .length > 0 ? (
@@ -979,15 +979,20 @@ const Dashboard = () => {
                                           setOpenStatePopover(false);
                                           setStateSearch("");
                                         }}
-                                        className={`w-full text-left px-3 py-2.5 text-sm hover:bg-blue-50 transition-colors ${
-                                          selectedState === state.state ? "bg-blue-100 font-semibold text-gray-900" : "text-gray-700"
+                                        className={`w-full text-left px-4 py-3 text-sm transition-colors flex items-center justify-between group ${
+                                          selectedState === state.state
+                                            ? "bg-blue-50 text-gray-900 font-semibold border-l-3 border-blue-500"
+                                            : "text-gray-700 hover:bg-gray-50 border-l-3 border-transparent"
                                         }`}
                                       >
-                                        {state.state}
+                                        <span>{state.state}</span>
+                                        {selectedState === state.state && (
+                                          <span className="text-blue-600 font-bold">✓</span>
+                                        )}
                                       </button>
                                     ))
                                 ) : (
-                                  <div className="px-3 py-8 text-sm text-gray-500 text-center">No states found</div>
+                                  <div className="px-4 py-8 text-sm text-gray-500 text-center">No states found</div>
                                 )}
                               </div>
                             </div>
@@ -1010,21 +1015,21 @@ const Dashboard = () => {
                             </button>
                           </PopoverTrigger>
                           <PopoverContent className="w-96 p-0" align="start">
-                            <div className="flex flex-col">
-                              <div className="sticky top-0 z-10 p-3 border-b border-gray-200 bg-white">
+                            <div className="flex flex-col bg-white rounded-lg overflow-hidden">
+                              <div className="sticky top-0 z-10 p-4 border-b border-gray-200 bg-white">
                                 <div className="relative">
-                                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                  <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                                   <input
                                     type="text"
-                                    placeholder="Search..."
+                                    placeholder="Search districts..."
                                     value={districtSearch}
                                     onChange={(e) => setDistrictSearch(e.target.value)}
-                                    className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white"
+                                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white transition-all"
                                     autoFocus
                                   />
                                 </div>
                               </div>
-                              <div className="max-h-64 overflow-y-auto">
+                              <div className="max-h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
                                 {selectedState && statesAndDistricts.states
                                   .find((s) => s.state === selectedState)
                                   ?.districts
@@ -1043,15 +1048,20 @@ const Dashboard = () => {
                                           setOpenDistrictPopover(false);
                                           setDistrictSearch("");
                                         }}
-                                        className={`w-full text-left px-3 py-2.5 text-sm hover:bg-blue-50 transition-colors ${
-                                          selectedDistrict === district ? "bg-blue-100 font-semibold text-gray-900" : "text-gray-700"
+                                        className={`w-full text-left px-4 py-3 text-sm transition-colors flex items-center justify-between group ${
+                                          selectedDistrict === district
+                                            ? "bg-blue-50 text-gray-900 font-semibold border-l-3 border-blue-500"
+                                            : "text-gray-700 hover:bg-gray-50 border-l-3 border-transparent"
                                         }`}
                                       >
-                                        {district}
+                                        <span>{district}</span>
+                                        {selectedDistrict === district && (
+                                          <span className="text-blue-600 font-bold">✓</span>
+                                        )}
                                       </button>
                                     ))
                                 ) : (
-                                  <div className="px-3 py-8 text-sm text-gray-500 text-center">No districts found</div>
+                                  <div className="px-4 py-8 text-sm text-gray-500 text-center">No districts found</div>
                                 )}
                               </div>
                             </div>

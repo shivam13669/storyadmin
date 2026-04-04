@@ -191,6 +191,67 @@ const Dashboard = () => {
     }
   }, [user?.fullName]);
 
+  // Initialize profile fields from user data
+  useEffect(() => {
+    if (user) {
+      if ((user as any).gender) {
+        setSelectedGender((user as any).gender);
+      }
+      if ((user as any).dateOfBirth) {
+        try {
+          const dobDate = new Date((user as any).dateOfBirth);
+          if (!isNaN(dobDate.getTime())) {
+            setSelectedDOB(dobDate);
+          }
+        } catch (e) {
+          console.error('Invalid DOB:', e);
+        }
+      }
+      if ((user as any).nationality) {
+        setSelectedNationality((user as any).nationality);
+      }
+      if ((user as any).maritalStatus) {
+        setSelectedMaritalStatus((user as any).maritalStatus);
+      }
+      if ((user as any).anniversary) {
+        try {
+          const annDate = new Date((user as any).anniversary);
+          if (!isNaN(annDate.getTime())) {
+            setSelectedAnniversary(annDate);
+          }
+        } catch (e) {
+          console.error('Invalid anniversary:', e);
+        }
+      }
+      if ((user as any).state) {
+        setSelectedState((user as any).state);
+      }
+      if ((user as any).district) {
+        setSelectedDistrict((user as any).district);
+      }
+      // Initialize document fields
+      if ((user as any).passportNumber) {
+        setPassportNumber((user as any).passportNumber);
+      }
+      if ((user as any).panCardNumber) {
+        setPanCardNumber((user as any).panCardNumber);
+      }
+      if ((user as any).passportExpiryDate) {
+        try {
+          const expiryDate = new Date((user as any).passportExpiryDate);
+          if (!isNaN(expiryDate.getTime())) {
+            setSelectedExpiryDate(expiryDate);
+          }
+        } catch (e) {
+          console.error('Invalid expiry date:', e);
+        }
+      }
+      if ((user as any).passportIssuingCountry) {
+        setSelectedCountry((user as any).passportIssuingCountry);
+      }
+    }
+  }, [user]);
+
   // Load user data function
   const loadData = async () => {
     if (!user?.id) return;

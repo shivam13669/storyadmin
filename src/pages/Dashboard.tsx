@@ -1601,7 +1601,7 @@ const Dashboard = () => {
                         disabled={documents.length >= 3}
                         className={`p-0 ${
                           documents.length >= 3
-                            ? "text-gray-400 cursor-not-allowed opacity-50"
+                            ? "text-gray-400 cursor-not-allowed opacity-70"
                             : "text-blue-600"
                         }`}
                         onClick={() => {

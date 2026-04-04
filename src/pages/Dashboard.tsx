@@ -31,6 +31,7 @@ import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { UserProfileView } from "@/components/dashboardViews/UserProfileView";
 import { ChangePasswordModal } from "@/components/ChangePasswordModal";
+import { AdvancedDatePicker } from "@/components/AdvancedDatePicker";
 import { changeUserPassword, getBookingsByUser, getTestimonialsByUser, updateUser, Booking, Testimonial } from "@/lib/api";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import statesAndDistricts from "@/data/states-and-districts.json";
@@ -115,6 +116,8 @@ const Dashboard = () => {
   const [openDistrictPopover, setOpenDistrictPopover] = useState(false);
   const [selectedGender, setSelectedGender] = useState("");
   const [openGenderPopover, setOpenGenderPopover] = useState(false);
+  const [selectedDOB, setSelectedDOB] = useState<Date | null>(null);
+  const [openDOBPopover, setOpenDOBPopover] = useState(false);
   const [selectedMaritalStatus, setSelectedMaritalStatus] = useState("");
   const [openMaritalStatusPopover, setOpenMaritalStatusPopover] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState("");
@@ -945,10 +948,29 @@ const Dashboard = () => {
                       </div>
                       <div>
                         <label className="text-sm font-semibold text-gray-900 uppercase tracking-wide">Date of Birth</label>
-                        <button className="w-full mt-2 px-3 py-2.5 border border-gray-200 rounded-lg bg-white hover:bg-gray-50 text-left text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all flex items-center justify-between">
-                          <span>Select Date</span>
-                          <ChevronDown className="h-5 w-5 text-gray-600 flex-shrink-0" />
-                        </button>
+                        <Popover open={openDOBPopover} onOpenChange={setOpenDOBPopover}>
+                          <PopoverTrigger asChild>
+                            <button
+                              type="button"
+                              className="w-full mt-2 px-3 py-2.5 border border-gray-200 rounded-lg bg-white hover:bg-gray-50 text-left text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all flex items-center justify-between"
+                            >
+                              <span className={selectedDOB ? "text-gray-900" : "text-gray-500"}>
+                                {selectedDOB ? format(selectedDOB, "dd MMM, yyyy") : "Select Date"}
+                              </span>
+                              <ChevronDown className="h-5 w-5 text-gray-600 flex-shrink-0" />
+                            </button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0 z-50" align="start">
+                            <AdvancedDatePicker
+                              selected={selectedDOB || undefined}
+                              onSelect={(date) => {
+                                setSelectedDOB(date);
+                                setOpenDOBPopover(false);
+                              }}
+                              maxDate={new Date()}
+                            />
+                          </PopoverContent>
+                        </Popover>
                       </div>
                     </div>
 
@@ -1486,11 +1508,6 @@ const Dashboard = () => {
                       </div>
                     </div>
 
-                    {/* Note */}
-                    <div className="text-xs text-orange-600 font-semibold">
-                      NOTE: Your PAN No. will not be used for international bookings as per RBI Guidelines
-                    </div>
-
                     {/* Document Rows */}
                     {documents.length > 0 && (
                       <div className="space-y-4 pt-6 border-t">
@@ -1618,11 +1635,19 @@ const Dashboard = () => {
                         + ADD DOCUMENT
                       </Button>
                     </div>
+
+                    {/* Note */}
+                    <div className="text-[13px] leading-5">
+                      <span className="font-semibold text-orange-600">NOTE:</span>{" "}
+                      <span className="text-slate-900">For Indian customers, PAN No. will only be used for international bookings as per RBI Guidelines</span>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
 
-              {/* Account Security Card */}
+            </div>
+          ) : activeNav === "settings" ? (
+            <>
               <Card className="border-0 shadow-md rounded-2xl">
                 <CardHeader>
                   <CardTitle>Account Security</CardTitle>
@@ -1639,19 +1664,7 @@ const Dashboard = () => {
                 onClose={() => setIsPasswordModalOpen(false)}
                 onSubmit={handleChangePassword}
               />
-            </div>
-          ) : activeNav === "settings" ? (
-            <Card className="border-0 shadow-md rounded-2xl">
-              <CardHeader>
-                <CardTitle>Settings</CardTitle>
-                <CardDescription>Account settings and preferences</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-8 text-gray-600">
-                  <p>Settings coming soon...</p>
-                </div>
-              </CardContent>
-            </Card>
+            </>
           ) : null
           }
         </div>

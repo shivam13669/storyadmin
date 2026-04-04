@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { formatDate, startOfDay, getDaysInMonth, startOfMonth } from "date-fns";
+import { format, startOfDay, getDaysInMonth, startOfMonth } from "date-fns";
 import { cn } from "@/lib/utils";
 
 interface AdvancedDatePickerProps {
@@ -8,6 +8,7 @@ interface AdvancedDatePickerProps {
   onSelect: (date: Date) => void;
   disabled?: (date: Date) => boolean;
   availableDates?: string[];
+  maxDate?: Date;
 }
 
 type PickerMode = "day" | "month" | "year";
@@ -17,8 +18,10 @@ export const AdvancedDatePicker = ({
   onSelect,
   disabled,
   availableDates,
+  maxDate,
 }: AdvancedDatePickerProps) => {
   const today = startOfDay(new Date());
+  const maxSelectableDate = maxDate ? startOfDay(maxDate) : null;
   const [mode, setMode] = useState<PickerMode>("day");
 
   // Get available years and months from availableDates
@@ -46,7 +49,7 @@ export const AdvancedDatePicker = ({
 
   // Initialize to first available date month if current month has no available dates
   const getInitialDate = () => {
-    if (selected) return selected;
+    if (selected) return maxSelectableDate && selected > maxSelectableDate ? maxSelectableDate : selected;
 
     if (availableDates && availableDates.length > 0) {
       const availableMonthsInCurrentYear = availableMonthsByYear.get(today.getFullYear()) || new Set();
@@ -67,6 +70,8 @@ export const AdvancedDatePicker = ({
 
   // Handle year selection
   const handleYearSelect = (year: number) => {
+    if (maxSelectableDate && year > maxSelectableDate.getFullYear()) return;
+
     const newDate = new Date(currentDate);
     newDate.setFullYear(year);
     setCurrentDate(newDate);
@@ -75,6 +80,8 @@ export const AdvancedDatePicker = ({
 
   // Handle month selection
   const handleMonthSelect = (month: number) => {
+    if (maxSelectableDate && currentYear === maxSelectableDate.getFullYear() && month > maxSelectableDate.getMonth()) return;
+
     const newDate = new Date(currentDate);
     newDate.setMonth(month);
     setCurrentDate(newDate);
@@ -85,6 +92,7 @@ export const AdvancedDatePicker = ({
   const handleDaySelect = (day: number) => {
     const newDate = new Date(currentDate);
     newDate.setDate(day);
+    if (maxSelectableDate && startOfDay(newDate) > maxSelectableDate) return;
     onSelect(newDate);
   };
 
@@ -149,6 +157,10 @@ export const AdvancedDatePicker = ({
 
     const handleNextMonth = () => {
       if (!availableDates || availableDates.length === 0) {
+        if (maxSelectableDate) {
+          const nextMonthStart = new Date(currentYear, currentMonth + 1, 1);
+          if (startOfDay(nextMonthStart) > maxSelectableDate) return;
+        }
         // No available dates, use normal navigation
         const newDate = new Date(currentDate);
         newDate.setMonth(newDate.getMonth() + 1);
@@ -199,7 +211,7 @@ export const AdvancedDatePicker = ({
             onClick={() => setMode("month")}
             className="px-3 py-1 hover:bg-primary/10 rounded-md transition-colors font-semibold text-foreground"
           >
-            {formatDate(currentDate, "MMMM yyyy")}
+            {format(currentDate, "MMMM yyyy")}
           </button>
 
           <button
@@ -310,7 +322,7 @@ export const AdvancedDatePicker = ({
         <div className="grid grid-cols-3 gap-2">
           {months.map((month, idx) => {
             const isAvailable = availableMonthsForYear.size === 0 || availableMonthsForYear.has(idx);
-            const isDisabledMonth = availableDates && availableDates.length > 0 && !isAvailable;
+            const isDisabledMonth = (availableDates && availableDates.length > 0 && !isAvailable) || (maxSelectableDate ? currentYear === maxSelectableDate.getFullYear() && idx > maxSelectableDate.getMonth() : false);
 
             return (
               <button
@@ -364,6 +376,7 @@ export const AdvancedDatePicker = ({
           <button
             type="button"
             onClick={() => {
+              if (maxSelectableDate && currentYear + 10 > maxSelectableDate.getFullYear()) return;
               const newDate = new Date(currentDate);
               newDate.setFullYear(currentYear + 10);
               setCurrentDate(newDate);
@@ -378,7 +391,7 @@ export const AdvancedDatePicker = ({
         <div className="grid grid-cols-3 gap-2">
           {years.map((year) => {
             const isAvailable = availableYears.size === 0 || availableYears.has(year);
-            const isDisabledYear = availableDates && availableDates.length > 0 && !isAvailable;
+            const isDisabledYear = (availableDates && availableDates.length > 0 && !isAvailable) || (maxSelectableDate ? year > maxSelectableDate.getFullYear() : false);
 
             return (
               <button

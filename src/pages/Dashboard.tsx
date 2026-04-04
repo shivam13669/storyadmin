@@ -1000,7 +1000,7 @@ const Dashboard = () => {
                               <PopoverTrigger asChild>
                                 <button
                                   type="button"
-                                  className="px-3 py-2.5 border border-gray-200 rounded-lg bg-gray-50/50 hover:bg-gray-100 transition-all flex items-center gap-2 min-w-fit focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                                  className="h-10 px-3 py-2 border border-gray-200 rounded-lg bg-gray-50/50 hover:bg-gray-100 transition-all flex items-center gap-2 min-w-fit focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                                 >
                                   <span className="text-sm font-medium">{selectedPhoneCountry.dial}</span>
                                   <ChevronDown className="h-4 w-4 text-gray-400" />

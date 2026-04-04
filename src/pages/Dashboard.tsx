@@ -1371,10 +1371,7 @@ const Dashboard = () => {
                                             : "text-gray-700 hover:bg-blue-50 border-l-3 border-transparent"
                                         }`}
                                       >
-                                        <div>
-                                          <span className="font-medium">{country.name}</span>
-                                          <span className="text-gray-600 ml-2 text-xs">({country.code})</span>
-                                        </div>
+                                        <span>{country.name}</span>
                                         {selectedCountry === country.name && (
                                           <span className="text-blue-600 font-bold">✓</span>
                                         )}

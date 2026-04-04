@@ -806,7 +806,44 @@ const Dashboard = () => {
                   <h3 className="text-xl font-semibold text-gray-900">My Profile</h3>
                   <p className="text-sm text-gray-600 mt-1">Manage your personal information and account settings</p>
                 </div>
-                <Button className="bg-gray-700 hover:bg-gray-800 text-white">SAVE</Button>
+                <Button
+                  className="bg-gray-700 hover:bg-gray-800 text-white"
+                  onClick={async () => {
+                    if (!editedName.trim()) {
+                      toast({
+                        title: "Error",
+                        description: "Name cannot be empty",
+                        variant: "destructive"
+                      });
+                      return;
+                    }
+
+                    setIsSavingName(true);
+                    try {
+                      if (!user?.id) {
+                        throw new Error("User not authenticated");
+                      }
+
+                      await updateUser(user.id, { fullName: editedName });
+                      await refreshUser();
+                      toast({
+                        title: "Success",
+                        description: "Your profile has been updated successfully"
+                      });
+                    } catch (error) {
+                      toast({
+                        title: "Error",
+                        description: error instanceof Error ? error.message : "Failed to update profile",
+                        variant: "destructive"
+                      });
+                    } finally {
+                      setIsSavingName(false);
+                    }
+                  }}
+                  disabled={isSavingName}
+                >
+                  {isSavingName ? "Saving..." : "SAVE"}
+                </Button>
               </div>
 
               {/* General Information Card */}
@@ -895,6 +932,16 @@ const Dashboard = () => {
                           <option value="">Select State</option>
                         </select>
                       </div>
+                    </div>
+
+                    {/* Member Since */}
+                    <div className="border-t pt-6">
+                      <label className="text-sm font-semibold text-gray-900 uppercase tracking-wide">Member Since</label>
+                      <p className="text-lg font-semibold text-gray-900 mt-2">
+                        {user?.signupDate && !isNaN(new Date(user.signupDate).getTime())
+                          ? format(new Date(user.signupDate), "MMMM dd, yyyy")
+                          : "—"}
+                      </p>
                     </div>
 
                     {/* Note */}
@@ -1018,8 +1065,15 @@ const Dashboard = () => {
                       )}
                     </div>
 
-                    {/* Add Email ID */}
+                    {/* Email Address */}
                     <div className="border-t pt-6">
+                      <label className="text-sm font-semibold text-gray-900 uppercase tracking-wide">Email Address</label>
+                      <p className="text-lg font-semibold text-gray-900 mt-2">{user?.email || "—"}</p>
+                      <p className="text-xs text-gray-500 mt-2">Cannot be changed after signup</p>
+                    </div>
+
+                    {/* Add Email ID */}
+                    <div>
                       <Button variant="link" className="text-blue-600 p-0">
                         + ADD EMAIL ID
                       </Button>

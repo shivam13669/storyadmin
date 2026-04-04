@@ -901,8 +901,8 @@ const Dashboard = () => {
                               <ChevronDown className="h-5 w-5 text-gray-600 flex-shrink-0" />
                             </button>
                           </PopoverTrigger>
-                          <PopoverContent className="w-48 p-0" align="start">
-                            <div className="flex flex-col bg-white rounded-lg overflow-hidden">
+                          <PopoverContent className="w-full sm:w-80 p-0 z-50" align="start">
+                            <div className="flex flex-col bg-white rounded-lg overflow-hidden shadow-lg">
                               {["Male", "Female", "Others"].map((gender) => (
                                 <button
                                   key={gender}
@@ -911,13 +911,16 @@ const Dashboard = () => {
                                     setSelectedGender(gender);
                                     setOpenGenderPopover(false);
                                   }}
-                                  className={`w-full text-left px-4 py-3 text-sm transition-colors ${
+                                  className={`w-full text-left px-4 py-3 text-sm transition-colors flex items-center justify-between ${
                                     selectedGender === gender
                                       ? "bg-blue-50 text-gray-900 font-semibold border-l-3 border-blue-500"
                                       : "text-gray-700 hover:bg-gray-50 border-l-3 border-transparent"
                                   }`}
                                 >
-                                  {gender}
+                                  <span>{gender}</span>
+                                  {selectedGender === gender && (
+                                    <span className="text-blue-600 font-bold">✓</span>
+                                  )}
                                 </button>
                               ))}
                             </div>
@@ -959,8 +962,8 @@ const Dashboard = () => {
                               <ChevronDown className="h-5 w-5 text-gray-600 flex-shrink-0" />
                             </button>
                           </PopoverTrigger>
-                          <PopoverContent className="w-48 p-0" align="start">
-                            <div className="flex flex-col bg-white rounded-lg overflow-hidden">
+                          <PopoverContent className="w-full sm:w-80 p-0 z-50" align="start">
+                            <div className="flex flex-col bg-white rounded-lg overflow-hidden shadow-lg">
                               {["Single", "Married", "Others"].map((status) => (
                                 <button
                                   key={status}
@@ -969,13 +972,16 @@ const Dashboard = () => {
                                     setSelectedMaritalStatus(status);
                                     setOpenMaritalStatusPopover(false);
                                   }}
-                                  className={`w-full text-left px-4 py-3 text-sm transition-colors ${
+                                  className={`w-full text-left px-4 py-3 text-sm transition-colors flex items-center justify-between ${
                                     selectedMaritalStatus === status
                                       ? "bg-blue-50 text-gray-900 font-semibold border-l-3 border-blue-500"
                                       : "text-gray-700 hover:bg-gray-50 border-l-3 border-transparent"
                                   }`}
                                 >
-                                  {status}
+                                  <span>{status}</span>
+                                  {selectedMaritalStatus === status && (
+                                    <span className="text-blue-600 font-bold">✓</span>
+                                  )}
                                 </button>
                               ))}
                             </div>

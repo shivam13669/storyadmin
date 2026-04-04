@@ -817,16 +817,19 @@ const Dashboard = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-6">
-                    {/* Full Name */}
-                    <div>
-                      <label className="text-sm font-semibold text-gray-900 uppercase tracking-wide">Full Name</label>
-                      <Input
-                        type="text"
-                        value={editedName}
-                        onChange={(e) => setEditedName(e.target.value)}
-                        placeholder="Enter your full name"
-                        className="mt-2"
-                      />
+                    {/* Full Name and empty column */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <label className="text-sm font-semibold text-gray-900 uppercase tracking-wide">Full Name</label>
+                        <Input
+                          type="text"
+                          value={editedName}
+                          onChange={(e) => setEditedName(e.target.value)}
+                          placeholder="Enter your full name"
+                          className="mt-2"
+                        />
+                      </div>
+                      <div></div>
                     </div>
 
                     {/* Gender and Date of Birth */}

@@ -901,7 +901,7 @@ const Dashboard = () => {
                               <ChevronDown className="h-5 w-5 text-gray-600 flex-shrink-0" />
                             </button>
                           </PopoverTrigger>
-                          <PopoverContent className="w-full sm:w-80 p-0 z-50" align="start">
+                          <PopoverContent className="w-[--radix-popover-trigger-width] p-0 z-50" align="start">
                             <div className="flex flex-col bg-white rounded-lg overflow-hidden shadow-lg">
                               {["Male", "Female", "Others"].map((gender) => (
                                 <button
@@ -962,7 +962,7 @@ const Dashboard = () => {
                               <ChevronDown className="h-5 w-5 text-gray-600 flex-shrink-0" />
                             </button>
                           </PopoverTrigger>
-                          <PopoverContent className="w-full sm:w-80 p-0 z-50" align="start">
+                          <PopoverContent className="w-[--radix-popover-trigger-width] p-0 z-50" align="start">
                             <div className="flex flex-col bg-white rounded-lg overflow-hidden shadow-lg">
                               {["Single", "Married", "Others"].map((status) => (
                                 <button
@@ -1014,8 +1014,8 @@ const Dashboard = () => {
                               <ChevronDown className="h-5 w-5 text-gray-600 flex-shrink-0" />
                             </button>
                           </PopoverTrigger>
-                          <PopoverContent className="w-96 p-0" align="start">
-                            <div className="flex flex-col bg-white rounded-lg overflow-hidden">
+                          <PopoverContent className="w-[--radix-popover-trigger-width] p-0 z-50" align="start">
+                            <div className="flex flex-col bg-white rounded-lg overflow-hidden shadow-lg">
                               <div className="sticky top-0 z-10 p-4 border-b border-gray-200 bg-white">
                                 <div className="relative">
                                   <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-600" />
@@ -1081,8 +1081,8 @@ const Dashboard = () => {
                               <ChevronDown className="h-5 w-5 text-gray-600 flex-shrink-0" />
                             </button>
                           </PopoverTrigger>
-                          <PopoverContent className="w-96 p-0" align="start">
-                            <div className="flex flex-col bg-white rounded-lg overflow-hidden">
+                          <PopoverContent className="w-[--radix-popover-trigger-width] p-0 z-50" align="start">
+                            <div className="flex flex-col bg-white rounded-lg overflow-hidden shadow-lg">
                               <div className="sticky top-0 z-10 p-4 border-b border-gray-200 bg-white">
                                 <div className="relative">
                                   <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-600" />

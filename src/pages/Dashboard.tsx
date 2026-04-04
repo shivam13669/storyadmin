@@ -1048,7 +1048,7 @@ const Dashboard = () => {
                                         className={`w-full text-left px-4 py-3 text-sm transition-colors flex items-center justify-between group ${
                                           selectedState === state.state
                                             ? "bg-blue-50 text-gray-900 font-semibold border-l-3 border-blue-500"
-                                            : "text-gray-700 hover:bg-gray-50 border-l-3 border-transparent"
+                                            : "text-gray-700 hover:bg-blue-50 border-l-3 border-transparent"
                                         }`}
                                       >
                                         <span>{state.state}</span>
@@ -1118,7 +1118,7 @@ const Dashboard = () => {
                                         className={`w-full text-left px-4 py-3 text-sm transition-colors flex items-center justify-between group ${
                                           selectedDistrict === district
                                             ? "bg-blue-50 text-gray-900 font-semibold border-l-3 border-blue-500"
-                                            : "text-gray-700 hover:bg-gray-50 border-l-3 border-transparent"
+                                            : "text-gray-700 hover:bg-blue-50 border-l-3 border-transparent"
                                         }`}
                                       >
                                         <span>{district}</span>

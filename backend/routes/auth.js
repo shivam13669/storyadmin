@@ -105,7 +105,8 @@ router.post('/login', async (req, res) => {
         passportNumber: user.passportNumber || null,
         passportExpiryDate: user.passportExpiryDate || null,
         passportIssuingCountry: user.passportIssuingCountry || null,
-        panCardNumber: user.panCardNumber || null
+        panCardNumber: user.panCardNumber || null,
+        documents: user.documents || null
       }
     });
   } catch (error) {
@@ -224,6 +225,11 @@ router.patch('/user/:id', async (req, res) => {
     if (passportIssuingCountry !== undefined) updates.passportIssuingCountry = passportIssuingCountry;
     if (panCardNumber !== undefined) updates.panCardNumber = panCardNumber;
 
+    // Handle documents array (convert to JSON string for storage)
+    if (req.body.documents !== undefined) {
+      updates.documents = req.body.documents ? JSON.stringify(req.body.documents) : null;
+    }
+
     if (Object.keys(updates).length === 0) {
       return res.status(400).json({ error: 'No fields to update' });
     }
@@ -249,7 +255,7 @@ router.patch('/user/:id', async (req, res) => {
 
 /**
  * PATCH /api/auth/user/:id/documents
- * Update user document details (passport, PAN, etc)
+ * Update user document details (passport, PAN, and documents array)
  */
 router.patch('/user/:id/documents', async (req, res) => {
   try {
@@ -258,7 +264,8 @@ router.patch('/user/:id/documents', async (req, res) => {
       passportNumber,
       passportExpiryDate,
       passportIssuingCountry,
-      panCardNumber
+      panCardNumber,
+      documents
     } = req.body;
     const updates = {};
 
@@ -267,6 +274,11 @@ router.patch('/user/:id/documents', async (req, res) => {
     if (passportExpiryDate !== undefined) updates.passportExpiryDate = passportExpiryDate;
     if (passportIssuingCountry !== undefined) updates.passportIssuingCountry = passportIssuingCountry;
     if (panCardNumber !== undefined) updates.panCardNumber = panCardNumber;
+
+    // Handle documents array (convert to JSON string for storage)
+    if (documents !== undefined) {
+      updates.documents = documents && documents.length > 0 ? JSON.stringify(documents) : null;
+    }
 
     if (Object.keys(updates).length === 0) {
       return res.status(400).json({ error: 'No fields to update' });
@@ -669,7 +681,8 @@ router.post('/google', async (req, res) => {
         passportNumber: user.passportNumber || null,
         passportExpiryDate: user.passportExpiryDate || null,
         passportIssuingCountry: user.passportIssuingCountry || null,
-        panCardNumber: user.panCardNumber || null
+        panCardNumber: user.panCardNumber || null,
+        documents: user.documents || null
       }
     });
   } catch (error) {

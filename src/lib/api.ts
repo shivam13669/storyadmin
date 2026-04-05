@@ -59,6 +59,7 @@ export interface AuthUser {
   passportExpiryDate?: string | null;
   passportIssuingCountry?: string | null;
   panCardNumber?: string | null;
+  documents?: string | null;
 }
 
 export async function signup(data: SignupData): Promise<{ user: AuthUser; message: string }> {

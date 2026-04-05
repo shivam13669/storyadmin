@@ -86,6 +86,7 @@ export class PostgresDatabase extends IDatabase {
       passportExpiryDate: row.passport_expiry_date,
       passportIssuingCountry: row.passport_issuing_country,
       panCardNumber: row.pan_card_number,
+      documents: row.documents,
     };
   }
 
@@ -142,7 +143,8 @@ export class PostgresDatabase extends IDatabase {
         passport_number TEXT,
         passport_expiry_date TEXT,
         passport_issuing_country TEXT,
-        pan_card_number TEXT
+        pan_card_number TEXT,
+        documents TEXT
       )
     `);
 
@@ -158,6 +160,7 @@ export class PostgresDatabase extends IDatabase {
     await this._query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS passport_expiry_date TEXT`);
     await this._query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS passport_issuing_country TEXT`);
     await this._query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS pan_card_number TEXT`);
+    await this._query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS documents TEXT`);
 
     await this._query(`
       CREATE TABLE IF NOT EXISTS bookings (
@@ -373,7 +376,7 @@ export class PostgresDatabase extends IDatabase {
   async getUserById(id) {
     try {
       const result = await this._query(
-        `SELECT id, full_name, email, role, mobile_number, country_code, testimonial_allowed, is_suspended, signup_date, phone_last_changed_at, gender, date_of_birth, nationality, marital_status, anniversary, state, district, passport_number, passport_expiry_date, passport_issuing_country, pan_card_number FROM users WHERE id = $1`,
+        `SELECT id, full_name, email, role, mobile_number, country_code, testimonial_allowed, is_suspended, signup_date, phone_last_changed_at, gender, date_of_birth, nationality, marital_status, anniversary, state, district, passport_number, passport_expiry_date, passport_issuing_country, pan_card_number, documents FROM users WHERE id = $1`,
         [id]
       );
 
@@ -390,7 +393,7 @@ export class PostgresDatabase extends IDatabase {
   async getUserByEmail(email) {
     try {
       const result = await this._query(
-        `SELECT id, full_name, email, password, role, mobile_number, country_code, testimonial_allowed, is_suspended, signup_date, phone_last_changed_at, gender, date_of_birth, nationality, marital_status, anniversary, state, district, passport_number, passport_expiry_date, passport_issuing_country, pan_card_number FROM users WHERE LOWER(email) = $1`,
+        `SELECT id, full_name, email, password, role, mobile_number, country_code, testimonial_allowed, is_suspended, signup_date, phone_last_changed_at, gender, date_of_birth, nationality, marital_status, anniversary, state, district, passport_number, passport_expiry_date, passport_issuing_country, pan_card_number, documents FROM users WHERE LOWER(email) = $1`,
         [email.toLowerCase()]
       );
 
@@ -422,6 +425,7 @@ export class PostgresDatabase extends IDatabase {
         passportExpiryDate: row.passport_expiry_date,
         passportIssuingCountry: row.passport_issuing_country,
         panCardNumber: row.pan_card_number,
+        documents: row.documents,
       };
     } catch (error) {
       throw new Error(`Failed to get user by email: ${error.message}`);
@@ -431,7 +435,7 @@ export class PostgresDatabase extends IDatabase {
   async getAllUsers() {
     try {
       const result = await this._query(
-        `SELECT id, full_name, email, role, mobile_number, country_code, testimonial_allowed, is_suspended, signup_date, phone_last_changed_at, gender, date_of_birth, nationality, marital_status, anniversary, state, district, passport_number, passport_expiry_date, passport_issuing_country, pan_card_number FROM users ORDER BY id`
+        `SELECT id, full_name, email, role, mobile_number, country_code, testimonial_allowed, is_suspended, signup_date, phone_last_changed_at, gender, date_of_birth, nationality, marital_status, anniversary, state, district, passport_number, passport_expiry_date, passport_issuing_country, pan_card_number, documents FROM users ORDER BY id`
       );
 
       return result.rows.map((row) => this._mapUserRow(row));

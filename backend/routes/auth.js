@@ -171,7 +171,6 @@ router.patch('/user/:id', async (req, res) => {
       countryCode,
       gender,
       dateOfBirth,
-      age,
       nationality,
       maritalStatus,
       anniversary,
@@ -185,7 +184,7 @@ router.patch('/user/:id', async (req, res) => {
     const updates = {};
 
     console.log(`🔄 Updating user ${id} with data:`, {
-      fullName, gender, dateOfBirth, age, nationality, maritalStatus,
+      fullName, gender, dateOfBirth, nationality, maritalStatus,
       anniversary, state, district, passportNumber, passportExpiryDate,
       passportIssuingCountry, panCardNumber
     });
@@ -238,8 +237,6 @@ router.patch('/user/:id', async (req, res) => {
     if (dateOfBirth !== undefined) {
       updates.dateOfBirth = dateOfBirth;
       updates.age = calculateAgeFromDateOfBirth(dateOfBirth);
-    } else if (age !== undefined) {
-      updates.age = age;
     }
     if (nationality !== undefined) updates.nationality = nationality;
     if (maritalStatus !== undefined) updates.maritalStatus = maritalStatus;

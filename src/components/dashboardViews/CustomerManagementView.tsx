@@ -272,7 +272,7 @@ export function CustomerManagementView({ users, onDataChange }: CustomerManageme
           <CardContent className="p-6">
             <div className="flex items-center gap-3">
               <div className="bg-gray-100 p-3 rounded-xl">
-                <span className="text-2xl font-bold text-gray-600">❓</span>
+                <span className="text-2xl font-bold text-gray-600">🤷</span>
               </div>
               <div>
                 <p className="text-sm text-gray-600">Not Specified</p>

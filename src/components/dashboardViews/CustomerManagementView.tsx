@@ -14,6 +14,7 @@ interface User {
   countryCode: string;
   signupDate: string;
   isSuspended: boolean;
+  gender?: string;
 }
 
 interface CustomerManagementViewProps {
@@ -26,34 +27,57 @@ export function CustomerManagementView({ users, onDataChange }: CustomerManageme
   const customersOnly = users.filter(u => u.role !== "admin");
 
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedGenderFilter, setSelectedGenderFilter] = useState<string | null>(null);
   const [filteredUsers, setFilteredUsers] = useState(customersOnly);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
-    const filtered = customersOnly.filter(
-      (user) =>
-        user.fullName.toLowerCase().includes(query.toLowerCase()) ||
-        user.email.toLowerCase().includes(query.toLowerCase()) ||
-        user.mobileNumber.includes(query)
-    );
+    applyFilters(query, selectedGenderFilter);
+  };
+
+  const applyFilters = (query: string, genderFilter: string | null) => {
+    let filtered = customersOnly;
+
+    // Apply search filter
+    if (query) {
+      filtered = filtered.filter(
+        (user) =>
+          user.fullName.toLowerCase().includes(query.toLowerCase()) ||
+          user.email.toLowerCase().includes(query.toLowerCase()) ||
+          user.mobileNumber.includes(query)
+      );
+    }
+
+    // Apply gender filter
+    if (genderFilter) {
+      if (genderFilter === "not-specified") {
+        filtered = filtered.filter((user) => !user.gender || user.gender === "");
+      } else {
+        filtered = filtered.filter((user) => user.gender === genderFilter);
+      }
+    }
+
     setFilteredUsers(filtered);
+  };
+
+  const handleGenderFilter = (gender: string | null) => {
+    setSelectedGenderFilter(gender);
+    applyFilters(searchQuery, gender);
   };
 
   // Update filteredUsers when users list changes
   useEffect(() => {
-    if (searchQuery) {
-      handleSearch(searchQuery);
-    } else {
-      setFilteredUsers(customersOnly);
-    }
+    applyFilters(searchQuery, selectedGenderFilter);
   }, [users]);
 
-  // Calculate metrics
+  // Calculate metrics based on real gender data
   const totalCustomers = customersOnly.length;
-  const maleCustomers = Math.round(customersOnly.length * 0.45); // Mock data
-  const femaleCustomers = Math.round(customersOnly.length * 0.55); // Mock data
+  const maleCustomers = customersOnly.filter((u) => u.gender === "Male").length;
+  const femaleCustomers = customersOnly.filter((u) => u.gender === "Female").length;
+  const othersCustomers = customersOnly.filter((u) => u.gender === "Other").length;
+  const notSpecifiedCustomers = customersOnly.filter((u) => !u.gender || u.gender === "").length;
   const thisMonth = customersOnly.filter(
     (u) => new Date(u.signupDate).getMonth() === new Date().getMonth()
   ).length;
@@ -147,50 +171,137 @@ export function CustomerManagementView({ users, onDataChange }: CustomerManageme
       </div>
 
       {/* Metrics Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="border-0 shadow-md rounded-2xl">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {/* Total Customers */}
+        <Card
+          className={`border-0 shadow-md rounded-2xl cursor-pointer transition-all ${
+            selectedGenderFilter === null
+              ? "ring-2 ring-blue-500 shadow-lg"
+              : "hover:shadow-lg"
+          }`}
+          onClick={() => handleGenderFilter(null)}
+        >
           <CardContent className="p-6">
             <div className="flex items-center gap-3">
               <div className="bg-blue-100 p-3 rounded-xl">
                 <span className="text-2xl font-bold text-blue-600">👥</span>
               </div>
               <div>
-                <p className="text-sm text-gray-600">Total Customers</p>
+                <p className="text-sm text-gray-600">Total Customer</p>
                 <p className="text-2xl font-bold text-gray-900">{totalCustomers}</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-0 shadow-md rounded-2xl">
+        {/* Male Customers */}
+        <Card
+          className={`border-0 shadow-md rounded-2xl cursor-pointer transition-all ${
+            selectedGenderFilter === "Male"
+              ? "ring-2 ring-blue-500 shadow-lg"
+              : "hover:shadow-lg"
+          }`}
+          onClick={() => handleGenderFilter("Male")}
+        >
           <CardContent className="p-6">
             <div className="flex items-center gap-3">
-              <div className="bg-green-100 p-3 rounded-xl">
-                <span className="text-2xl font-bold text-green-600">👨</span>
+              <div className="bg-blue-100 p-3 rounded-xl">
+                <span className="text-2xl font-bold text-blue-600">👨</span>
               </div>
               <div>
-                <p className="text-sm text-gray-600">Male Customers</p>
+                <p className="text-sm text-gray-600">Male Customer</p>
                 <p className="text-2xl font-bold text-gray-900">{maleCustomers}</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-0 shadow-md rounded-2xl">
+        {/* Female Customers */}
+        <Card
+          className={`border-0 shadow-md rounded-2xl cursor-pointer transition-all ${
+            selectedGenderFilter === "Female"
+              ? "ring-2 ring-pink-500 shadow-lg"
+              : "hover:shadow-lg"
+          }`}
+          onClick={() => handleGenderFilter("Female")}
+        >
           <CardContent className="p-6">
             <div className="flex items-center gap-3">
               <div className="bg-pink-100 p-3 rounded-xl">
                 <span className="text-2xl font-bold text-pink-600">👩</span>
               </div>
               <div>
-                <p className="text-sm text-gray-600">Female Customers</p>
+                <p className="text-sm text-gray-600">Female Customer</p>
                 <p className="text-2xl font-bold text-gray-900">{femaleCustomers}</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-0 shadow-md rounded-2xl">
+        {/* Others Customers */}
+        <Card
+          className={`border-0 shadow-md rounded-2xl cursor-pointer transition-all ${
+            selectedGenderFilter === "Other"
+              ? "ring-2 ring-purple-500 shadow-lg"
+              : "hover:shadow-lg"
+          }`}
+          onClick={() => handleGenderFilter("Other")}
+        >
+          <CardContent className="p-6">
+            <div className="flex items-center gap-3">
+              <div className="bg-purple-100 p-3 rounded-xl">
+                <span className="text-2xl font-bold text-purple-600">👤</span>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Others Customers</p>
+                <p className="text-2xl font-bold text-gray-900">{othersCustomers}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Not Specified Customers */}
+        <Card
+          className={`border-0 shadow-md rounded-2xl cursor-pointer transition-all ${
+            selectedGenderFilter === "not-specified"
+              ? "ring-2 ring-gray-500 shadow-lg"
+              : "hover:shadow-lg"
+          }`}
+          onClick={() => handleGenderFilter("not-specified")}
+        >
+          <CardContent className="p-6">
+            <div className="flex items-center gap-3">
+              <div className="bg-gray-100 p-3 rounded-xl">
+                <span className="text-2xl font-bold text-gray-600">❓</span>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Not Specified</p>
+                <p className="text-2xl font-bold text-gray-900">{notSpecifiedCustomers}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* This Month */}
+        <Card
+          className={`border-0 shadow-md rounded-2xl cursor-pointer transition-all ${
+            selectedGenderFilter === "this-month"
+              ? "ring-2 ring-orange-500 shadow-lg"
+              : "hover:shadow-lg"
+          }`}
+          onClick={() => {
+            if (selectedGenderFilter === "this-month") {
+              handleGenderFilter(null);
+            } else {
+              setSelectedGenderFilter("this-month");
+              const currentMonth = new Date().getMonth();
+              const filtered = customersOnly.filter(
+                (u) => new Date(u.signupDate).getMonth() === currentMonth
+              );
+              setFilteredUsers(filtered);
+            }
+          }}
+        >
           <CardContent className="p-6">
             <div className="flex items-center gap-3">
               <div className="bg-orange-100 p-3 rounded-xl">

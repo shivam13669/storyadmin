@@ -267,8 +267,24 @@ const Dashboard = () => {
       if ((user as any).passportIssuingCountry) {
         setSelectedCountry((user as any).passportIssuingCountry);
       }
-      // Documents start empty - only added via "+ ADD DOCUMENT" button
-      setDocuments([]);
+      // Load documents from user object if they exist
+      if ((user as any).documents) {
+        try {
+          const parsedDocs = typeof (user as any).documents === 'string'
+            ? JSON.parse((user as any).documents)
+            : (user as any).documents;
+          if (Array.isArray(parsedDocs)) {
+            setDocuments(parsedDocs);
+          } else {
+            setDocuments([]);
+          }
+        } catch (e) {
+          console.error('Error parsing documents:', e);
+          setDocuments([]);
+        }
+      } else {
+        setDocuments([]);
+      }
     }
   }, [user]);
 
@@ -1771,7 +1787,6 @@ const Dashboard = () => {
                                           value={docTypeSearches[doc.id] || ""}
                                           onChange={(e) => setDocTypeSearches({...docTypeSearches, [doc.id]: e.target.value})}
                                           className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white transition-all"
-                                          autoFocus
                                         />
                                       </div>
                                     </div>

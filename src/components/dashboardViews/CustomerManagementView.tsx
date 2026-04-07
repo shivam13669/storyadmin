@@ -14,6 +14,7 @@ interface User {
   countryCode: string;
   signupDate: string;
   isSuspended: boolean;
+  gender?: string;
 }
 
 interface CustomerManagementViewProps {
@@ -50,10 +51,12 @@ export function CustomerManagementView({ users, onDataChange }: CustomerManageme
     }
   }, [users]);
 
-  // Calculate metrics
+  // Calculate metrics based on real gender data
   const totalCustomers = customersOnly.length;
-  const maleCustomers = Math.round(customersOnly.length * 0.45); // Mock data
-  const femaleCustomers = Math.round(customersOnly.length * 0.55); // Mock data
+  const maleCustomers = customersOnly.filter((u) => u.gender === "Male").length;
+  const femaleCustomers = customersOnly.filter((u) => u.gender === "Female").length;
+  const othersCustomers = customersOnly.filter((u) => u.gender === "Other").length;
+  const notSpecifiedCustomers = customersOnly.filter((u) => !u.gender || u.gender === "").length;
   const thisMonth = customersOnly.filter(
     (u) => new Date(u.signupDate).getMonth() === new Date().getMonth()
   ).length;
@@ -147,7 +150,7 @@ export function CustomerManagementView({ users, onDataChange }: CustomerManageme
       </div>
 
       {/* Metrics Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <Card className="border-0 shadow-md rounded-2xl">
           <CardContent className="p-6">
             <div className="flex items-center gap-3">
@@ -155,7 +158,7 @@ export function CustomerManagementView({ users, onDataChange }: CustomerManageme
                 <span className="text-2xl font-bold text-blue-600">👥</span>
               </div>
               <div>
-                <p className="text-sm text-gray-600">Total Customers</p>
+                <p className="text-sm text-gray-600">Total Customer</p>
                 <p className="text-2xl font-bold text-gray-900">{totalCustomers}</p>
               </div>
             </div>
@@ -165,11 +168,11 @@ export function CustomerManagementView({ users, onDataChange }: CustomerManageme
         <Card className="border-0 shadow-md rounded-2xl">
           <CardContent className="p-6">
             <div className="flex items-center gap-3">
-              <div className="bg-green-100 p-3 rounded-xl">
-                <span className="text-2xl font-bold text-green-600">👨</span>
+              <div className="bg-blue-100 p-3 rounded-xl">
+                <span className="text-2xl font-bold text-blue-600">👨</span>
               </div>
               <div>
-                <p className="text-sm text-gray-600">Male Customers</p>
+                <p className="text-sm text-gray-600">Male Customer</p>
                 <p className="text-2xl font-bold text-gray-900">{maleCustomers}</p>
               </div>
             </div>
@@ -183,8 +186,36 @@ export function CustomerManagementView({ users, onDataChange }: CustomerManageme
                 <span className="text-2xl font-bold text-pink-600">👩</span>
               </div>
               <div>
-                <p className="text-sm text-gray-600">Female Customers</p>
+                <p className="text-sm text-gray-600">Female Customer</p>
                 <p className="text-2xl font-bold text-gray-900">{femaleCustomers}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-0 shadow-md rounded-2xl">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-3">
+              <div className="bg-purple-100 p-3 rounded-xl">
+                <span className="text-2xl font-bold text-purple-600">👤</span>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Others Customers</p>
+                <p className="text-2xl font-bold text-gray-900">{othersCustomers}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-0 shadow-md rounded-2xl">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-3">
+              <div className="bg-gray-100 p-3 rounded-xl">
+                <span className="text-2xl font-bold text-gray-600">🤷</span>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Not Specified</p>
+                <p className="text-2xl font-bold text-gray-900">{notSpecifiedCustomers}</p>
               </div>
             </div>
           </CardContent>

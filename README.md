@@ -889,6 +889,6 @@ pnpm build
 
 ---
 
-**Last Updated:** 2024
+**Last Updated:** April 2026
 
 **Maintained by:** StoriesByFoot Team

@@ -1,28 +1,42 @@
 import nodemailer from 'nodemailer';
 import dns from 'dns';
+import net from 'net';
 
 // Force IPv4 DNS resolution
 dns.setDefaultResultOrder('ipv4first');
 
-// Create transporter using Gmail SMTP
-const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 465,
-  secure: true,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-  tls: {
-    rejectUnauthorized: false
-  },
-  connectionTimeout: 10000,
-  socketTimeout: 10000,
-  maxConnections: 5,
-  maxMessages: 100,
-  rateDelta: 1000,
-  rateLimit: 10
-});
+// Disable IPv6
+net.setIPv6Loopback(false);
+
+let transporter = null;
+
+function createTransporter() {
+  return nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false,
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+    tls: {
+      rejectUnauthorized: false,
+      minVersion: 'TLSv1.2'
+    },
+    connectionTimeout: 15000,
+    socketTimeout: 15000,
+    greetingTimeout: 10000,
+    pool: {
+      maxConnections: 1,
+      maxMessages: 100,
+      rateDelta: 1000,
+      rateLimit: 10
+    }
+  });
+}
+
+// Initialize transporter
+transporter = createTransporter();
 
 /**
  * Send OTP email to user
@@ -151,7 +165,22 @@ export async function sendOTPEmail(email, otp) {
     };
   } catch (error) {
     console.error(`❌ Failed to send OTP email to ${email}:`, error);
-    throw new Error(`Failed to send OTP email: ${error.message}`);
+
+    // Try recreating transporter and retrying once
+    try {
+      console.log('🔄 Retrying with new transporter...');
+      transporter = createTransporter();
+      const result = await transporter.sendMail(mailOptions);
+      console.log(`✅ OTP email sent to ${email} on retry`);
+      return {
+        success: true,
+        message: 'OTP sent successfully',
+        messageId: result.messageId,
+      };
+    } catch (retryError) {
+      console.error(`❌ Retry failed:`, retryError);
+      throw new Error(`Failed to send OTP email: ${error.message}`);
+    }
   }
 }
 

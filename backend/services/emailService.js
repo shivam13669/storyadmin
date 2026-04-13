@@ -1,7 +1,18 @@
 import { Resend } from 'resend';
 
-// Initialize Resend client
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Initialize Resend client (lazily)
+let resend = null;
+
+function getResendClient() {
+  if (!resend) {
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) {
+      throw new Error('RESEND_API_KEY environment variable is not set');
+    }
+    resend = new Resend(apiKey);
+  }
+  return resend;
+}
 
 /**
  * Send OTP email to user
@@ -108,7 +119,8 @@ export async function sendOTPEmail(email, otp) {
       </html>
     `;
 
-    const result = await resend.emails.send({
+    const resendClient = getResendClient();
+    const result = await resendClient.emails.send({
       from: 'noreply@storiesbyfoot.com',
       to: email,
       subject: 'Your OTP Verification Code - Stories by Foot',

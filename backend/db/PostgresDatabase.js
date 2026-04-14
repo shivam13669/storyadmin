@@ -861,6 +861,19 @@ export class PostgresDatabase extends IDatabase {
     }
   }
 
+  async deleteExpiredOTPs() {
+    try {
+      const now = new Date().toISOString();
+      const result = await this._query(
+        `DELETE FROM otp_verifications WHERE expires_at < $1`,
+        [now]
+      );
+      return result.rowCount || 0;
+    } catch (error) {
+      throw new Error(`Failed to delete expired OTPs: ${error.message}`);
+    }
+  }
+
   // ============ Coupons Operations ============
 
   _mapCouponRow(row) {

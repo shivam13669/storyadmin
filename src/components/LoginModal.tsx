@@ -746,12 +746,12 @@ export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
                     </div>
 
                     {/* Google Sign In */}
-                    <div className="flex justify-center w-full">
+                    <div className="w-full">
                       <GoogleLogin
                         onSuccess={handleGoogleLogin}
                         onError={() => toast.error("Google login failed")}
                         text="signin_with"
-                        width="360"
+                        width="100%"
                       />
                     </div>
 

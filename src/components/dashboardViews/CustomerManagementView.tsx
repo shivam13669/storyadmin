@@ -104,6 +104,11 @@ export function CustomerManagementView({ users, onDataChange }: CustomerManageme
     return countryCodeMap[code] || code;
   };
 
+  const isValidMobileNumber = (number: string) => {
+    // Check if mobileNumber exists and doesn't start with GOOGLE_
+    return number && !number.startsWith("GOOGLE_");
+  };
+
   const handleExportList = () => {
     const csvContent = [
       ["Name", "Email", "Phone", "Joined Date"],
@@ -117,7 +122,7 @@ export function CustomerManagementView({ users, onDataChange }: CustomerManageme
         return [
           user.fullName,
           user.email,
-          user.mobileNumber ? `+${getNumericCountryCode(user.countryCode)} ${user.mobileNumber}` : "",
+          isValidMobileNumber(user.mobileNumber) ? `+${getNumericCountryCode(user.countryCode)} ${user.mobileNumber}` : "",
           formattedDate,
         ];
       }),
@@ -283,7 +288,7 @@ export function CustomerManagementView({ users, onDataChange }: CustomerManageme
                         <span className="flex items-center gap-1">
                           <Mail className="w-4 h-4" /> {user.email}
                         </span>
-                        {user.mobileNumber ? (
+                        {isValidMobileNumber(user.mobileNumber) ? (
                           <span className="flex items-center gap-1">
                             <Phone className="w-4 h-4" /> +{getNumericCountryCode(user.countryCode)} {user.mobileNumber}
                           </span>

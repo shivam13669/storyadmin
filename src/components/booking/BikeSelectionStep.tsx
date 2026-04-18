@@ -2,6 +2,7 @@ import { Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { BookingFormData } from "@/pages/BookingPage";
 import { DestinationPackage } from "@/data/destinations";
 import { useCurrency } from "@/context/CurrencyContext";
+import { getBikePrice } from "@/data/pricing";
 import { useState, useRef, useEffect } from "react";
 
 interface BikeSelectionStepProps {
@@ -18,7 +19,8 @@ const BikeSelectionStep = ({
   onFormDataChange,
 }: BikeSelectionStepProps) => {
   const [scrollPosition, setScrollPosition] = useState(0);
-  const { formatPrice } = useCurrency();
+  const { formatPrice, currency } = useCurrency();
+  const currencyCode = currency?.code || "INR";
   // Default to solo when no co-travelers, otherwise use formData preference
   const defaultSeating = formData.guests.length === 0 ? "solo" : (formData.seatingPreference || "solo");
   const [seatingPreference, setSeatingPreference] = useState<"solo" | "dual-sharing" | "seat-in-backup">(
@@ -50,21 +52,14 @@ const BikeSelectionStep = ({
   const regularBikes = travelPackage.bikes?.filter(bike => !bike.isBackupVehicle) || [];
   const backupVehicle = travelPackage.bikes?.find(bike => bike.isBackupVehicle);
 
-  const getBikePrice = (bike: any) => {
-    // For backup vehicle, use seating prices
-    if (bike.isBackupVehicle && bike.seatingPrices && seatingPreference in bike.seatingPrices) {
-      return bike.seatingPrices[seatingPreference];
-    }
-    // For regular bikes, use seating prices for solo/dual-sharing only, not seat-in-backup
-    if (!bike.isBackupVehicle && bike.seatingPrices && seatingPreference !== "seat-in-backup" && seatingPreference in bike.seatingPrices) {
-      return bike.seatingPrices[seatingPreference];
-    }
-    // For regular bikes with seat-in-backup selected, show their solo price
-    if (!bike.isBackupVehicle && seatingPreference === "seat-in-backup" && bike.seatingPrices && "solo" in bike.seatingPrices) {
-      return bike.seatingPrices["solo"];
-    }
-    // Otherwise use the traditional multiplier method
-    return Math.round(basePrice * (bike.priceMultiplier || 1.0));
+  const getBikePriceForDisplay = (bikeId: string) => {
+    // Use centralized pricing with currency
+    return getBikePrice(
+      travelPackage.slug,
+      bikeId,
+      seatingPreference,
+      currencyCode
+    );
   };
 
   const handleBikeSelect = (bikeId: string) => {
@@ -175,7 +170,7 @@ const BikeSelectionStep = ({
                       </p>
                       <div className="flex items-baseline gap-2">
                         <span className="text-2xl font-bold text-gray-900">
-                          {formatPrice(30799)}
+                          {formatPrice(getBikePriceForDisplay("own-bike"))}
                         </span>
                       </div>
                     </div>
@@ -196,7 +191,7 @@ const BikeSelectionStep = ({
 
               {/* Provided Bikes */}
               {regularBikes.map((bike) => {
-                const bikePrice = getBikePrice(bike);
+                const bikePrice = getBikePriceForDisplay(bike.id);
                 const priceDifference = bikePrice - basePrice;
                 const isSelected = formData.selectedBikeId === bike.id;
 
@@ -334,7 +329,7 @@ const BikeSelectionStep = ({
                       </p>
                       <div className="flex items-baseline gap-2">
                         <span className="text-2xl font-bold text-gray-900">
-                          {formatPrice(getBikePrice(backupVehicle))}
+                          {formatPrice(getBikePriceForDisplay(backupVehicle.id))}
                         </span>
                       </div>
                     </div>

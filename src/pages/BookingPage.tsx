@@ -147,6 +147,11 @@ const BookingPage = () => {
   const isTransHimalayan = travelPackage.slug === "trans-himalayan-ride";
   const currencyCode = currency?.code || "INR";
 
+  // Get base price from centralized pricing (in INR, no currency markup)
+  const packagePricing = getPackagePricing(packageSlug || "");
+  const basePriceINR = packagePricing ? packagePricing.basePriceINR : 0;
+  const basePrice = basePriceINR; // basePrice in INR for email/reference
+
   // Get bike price from centralized pricing (includes seating preference and currency markup)
   let bikePrice = 0;
   if (formData.selectedBikeId) {
@@ -158,8 +163,7 @@ const BookingPage = () => {
     );
   } else {
     // Fallback to base price if no bike selected
-    const packagePricing = getPackagePricing(packageSlug || "");
-    bikePrice = packagePricing ? packagePricing.basePriceINR : 0;
+    bikePrice = basePriceINR;
   }
 
   const totalTravelers = 1 + formData.guests.length; // Primary traveler + co-travelers

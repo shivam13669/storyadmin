@@ -111,7 +111,7 @@ const jobListings = [
     location: "Remote",
     type: "Full-time",
     experience: "1-2 years",
-    description: "Be the voice of StoriesByFoot and provide exceptional support.",
+    description: "Be the voice of Stories by Foot and provide exceptional support.",
     isFeatured: false,
     category: "Support",
     salary: "₹16,000 - ₹28,000/month",
@@ -160,18 +160,18 @@ const jobListings = [
 const teamMembers = [
   {
     name: "Nitin Mishra",
-    role: "Founder, StoriesByFoot",
-    bio: "Visionary explorer and adventure enthusiast who founded StoriesByFoot with a passion to create unforgettable travel experiences and build a team that shares the same spirit."
+    role: "Founder, Stories by Foot",
+    bio: "Visionary explorer and adventure enthusiast who founded Stories by Foot with a passion to create unforgettable travel experiences and build a team that shares the same spirit."
   },
   {
     name: "Shivam Anand",
     role: "Tech Lead",
-    bio: "Tech innovator building the digital backbone of StoriesByFoot. Passionate about creating seamless experiences that connect adventurers with their next great journey."
+    bio: "Tech innovator building the digital backbone of Stories by Foot. Passionate about creating seamless experiences that connect adventurers with their next great journey."
   },
   {
     name: "Aaditi",
     role: "Head of Sales",
-    bio: "Dynamic sales leader driving growth and building lasting relationships with adventurers worldwide. Passionate about sharing StoriesByFoot's mission and creating exceptional customer experiences."
+    bio: "Dynamic sales leader driving growth and building lasting relationships with adventurers worldwide. Passionate about sharing Stories by Foot's mission and creating exceptional customer experiences."
   }
 ];
 
@@ -438,7 +438,7 @@ export default function CareersPage() {
 
         {/* Why Join Section */}
         <section className="max-w-5xl mx-auto mb-20">
-          <h2 className="text-4xl font-bold text-center mb-12">Why Join StoriesBy<span className="text-secondary">Foot</span>?</h2>
+          <h2 className="text-4xl font-bold text-center mb-12">Why Join Stories by<span className="text-secondary">Foot</span>?</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {benefits.map((benefit, index) => (
               <div

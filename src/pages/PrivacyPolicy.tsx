@@ -45,10 +45,10 @@ export default function PrivacyPolicyPage() {
               {/* Introduction */}
               <section className="space-y-4 pb-8 border-b border-slate-200" style={{ scrollMarginTop: "120px" }}>
                 <p className="text-slate-700 leading-relaxed text-lg">
-                  Welcome to StoriesByFoot ("we," "our," or "us"). This Privacy Policy explains how we collect, use, store, and protect your personal information when you visit or use our website <a href="https://storiesbyfoot.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-semibold">https://storiesbyfoot.com</a> (the "Website") and any related features, services, or content (collectively, the "Services"). By using our Website, you consent to the practices described in this Privacy Policy. If you do not agree with any part of this Policy, please discontinue using our Services.
+                  Welcome to Stories by Foot ("we," "our," or "us"). This Privacy Policy explains how we collect, use, store, and protect your personal information when you visit or use our website <a href="https://storiesbyfoot.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-semibold">https://storiesbyfoot.com</a> (the "Website") and any related features, services, or content (collectively, the "Services"). By using our Website, you consent to the practices described in this Privacy Policy. If you do not agree with any part of this Policy, please discontinue using our Services.
                 </p>
                 <p className="text-slate-700 leading-relaxed text-lg">
-                  StoriesByFoot, together with its trusted service partners, manages and safeguards personal information collected through this Website in accordance with this Privacy Policy and the Terms and Conditions.
+                  Stories by Foot, together with its trusted service partners, manages and safeguards personal information collected through this Website in accordance with this Privacy Policy and the Terms and Conditions.
                 </p>
               </section>
 
@@ -247,7 +247,7 @@ export default function PrivacyPolicyPage() {
 
                   <div className="pt-4 border-t border-slate-200">
                     <h3 className="font-bold text-slate-900 text-lg mb-2">4.3. Business Transfers</h3>
-                    <p className="text-slate-700 leading-relaxed">If StoriesByFoot undergoes a merger, acquisition, or reorganization, your data may be transferred as part of that transaction, but your privacy rights will remain protected.</p>
+                    <p className="text-slate-700 leading-relaxed">If Stories by Foot undergoes a merger, acquisition, or reorganization, your data may be transferred as part of that transaction, but your privacy rights will remain protected.</p>
                   </div>
                 </div>
               </section>
@@ -317,7 +317,7 @@ export default function PrivacyPolicyPage() {
               <section id="third-party-links" className="space-y-4 pb-8 border-b border-slate-200" style={{ scrollMarginTop: "120px" }}>
                 <h2 className="text-3xl font-bold text-slate-900">8. Third-Party Links</h2>
                 <p className="text-slate-700 leading-relaxed">
-                  Our Website may contain links to external websites (e.g., hotel partners, tourism boards). StoriesByFoot is not responsible for the privacy practices or content of such third-party sites. We encourage you to review their policies before interacting or sharing information.
+                  Our Website may contain links to external websites (e.g., hotel partners, tourism boards). Stories by Foot is not responsible for the privacy practices or content of such third-party sites. We encourage you to review their policies before interacting or sharing information.
                 </p>
               </section>
 
@@ -344,7 +344,7 @@ export default function PrivacyPolicyPage() {
               <section id="changes-to-this-privacy-policy" className="space-y-4 pb-8 border-b border-slate-200" style={{ scrollMarginTop: "120px" }}>
                 <h2 className="text-3xl font-bold text-slate-900">11. Changes to this Privacy Policy</h2>
                 <p className="text-slate-700 leading-relaxed">
-                  StoriesByFoot reserves the right to modify or update this Privacy Policy at any time. All changes will be posted on this page with an updated "Last Updated" date. Your continued use of the Website after changes signifies acceptance of the revised Policy.
+                  Stories by Foot reserves the right to modify or update this Privacy Policy at any time. All changes will be posted on this page with an updated "Last Updated" date. Your continued use of the Website after changes signifies acceptance of the revised Policy.
                 </p>
               </section>
 
@@ -380,7 +380,7 @@ export default function PrivacyPolicyPage() {
               <section className="space-y-4 pt-8" style={{ scrollMarginTop: "120px" }}>
                 <h2 className="text-3xl font-bold text-slate-900">Disclaimer</h2>
                 <p className="text-slate-700 leading-relaxed">
-                  StoriesByFoot values your trust and takes your privacy seriously. While we adopt best practices to protect your information, no electronic storage or transmission method is completely secure. Use of our Website implies your acceptance of this inherent risk.
+                  Stories by Foot values your trust and takes your privacy seriously. While we adopt best practices to protect your information, no electronic storage or transmission method is completely secure. Use of our Website implies your acceptance of this inherent risk.
                 </p>
               </section>
             </div>

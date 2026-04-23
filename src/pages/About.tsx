@@ -50,7 +50,7 @@ export default function AboutPage() {
     {
       year: "October 2020",
       title: "The Beginning",
-      desc: "StoriesByFoot is born from PlanYorTrip with a revolutionary vision: to redefine adventure travel. Our founding team launches the first expeditions in Ladakh with 15 riders who become our inspiration."
+      desc: "Stories by Foot is born from PlanYorTrip with a revolutionary vision: to redefine adventure travel. Our founding team launches the first expeditions in Ladakh with 15 riders who become our inspiration."
     },
     {
       year: "2021-2022",
@@ -60,7 +60,7 @@ export default function AboutPage() {
     {
       year: "2023-2024",
       title: "Going International",
-      desc: "StoriesByFoot crosses borders into Bhutan and Upper Mustang. We reach our 500th expedition milestone and welcome the 10,000th traveler. International partnerships strengthen our global presence."
+      desc: "Stories by Foot crosses borders into Bhutan and Upper Mustang. We reach our 500th expedition milestone and welcome the 10,000th traveler. International partnerships strengthen our global presence."
     },
     {
       year: "Today",
@@ -104,14 +104,14 @@ export default function AboutPage() {
 
                 <div className="space-y-6 border-t border-orange-200 pt-8">
                   <div>
-                    <h2 className="text-2xl font-bold text-slate-900 mb-3">From PlanYorTrip to StoriesByFoot</h2>
+                    <h2 className="text-2xl font-bold text-slate-900 mb-3">From PlanYorTrip to Stories by Foot</h2>
                     <p className="text-slate-600 leading-relaxed">
                       <strong>Founded in October 2020</strong>, we had a revelation: traditional travel platforms were missing the human element, the cultural depth, and the transformative power of real adventure.
                     </p>
                   </div>
 
                   <p className="text-slate-600 leading-relaxed">
-                    We rebranded to <strong>StoriesByFoot</strong> to reflect our deeper mission. We weren't just booking trips, we were crafting unforgettable narratives. Every mountain pass, every sunset, every conversation becomes a chapter in your story.
+                    We rebranded to <strong>Stories by Foot</strong> to reflect our deeper mission. We weren't just booking trips, we were crafting unforgettable narratives. Every mountain pass, every sunset, every conversation becomes a chapter in your story.
                   </p>
 
                   <div className="bg-white rounded-xl p-6 border border-orange-200 shadow-sm">
@@ -137,7 +137,7 @@ export default function AboutPage() {
               </p>
 
               <p>
-                Born from the rebranding of <strong>PlanYorTrip</strong>, StoriesByFoot transformed a traditional travel booking service into something far more profound a community of storytellers, adventurers, and explorers who believe that the best journeys are the ones that change you.
+                Born from the rebranding of <strong>PlanYorTrip</strong>, Stories by Foot transformed a traditional travel booking service into something far more profound a community of storytellers, adventurers, and explorers who believe that the best journeys are the ones that change you.
               </p>
 
               <p>
@@ -149,7 +149,7 @@ export default function AboutPage() {
               </p>
 
               <p>
-                But numbers alone don't tell our story. What truly defines StoriesByFoot is the trust you place in us, the friendships formed on mountain passes, the cultural connections made in remote villages, and the personal transformations that happen when you step out of your comfort zone and into the unknown.
+                But numbers alone don't tell our story. What truly defines Stories by Foot is the trust you place in us, the friendships formed on mountain passes, the cultural connections made in remote villages, and the personal transformations that happen when you step out of your comfort zone and into the unknown.
               </p>
             </div>
           </div>
@@ -230,11 +230,11 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Why StoriesByFoot */}
+      {/* Why Stories by Foot */}
       <section className="py-20 px-6 md:px-12 bg-slate-50">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-slate-900 mb-3">Why Explore with StoriesByFoot?</h2>
+            <h2 className="text-4xl font-bold text-slate-900 mb-3">Why Explore with Stories by Foot?</h2>
             <p className="text-xl text-slate-600">We don't just take you places. We take you home forever.</p>
           </div>
 

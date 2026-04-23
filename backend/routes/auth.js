@@ -1,7 +1,15 @@
 import express from 'express';
 import { UserRepository } from '../repositories/UserRepository.js';
 import { sendOTPEmail } from '../services/emailService.js';
-import { generateOTP, getOTPExpirationTime, verifyOTP } from '../utils/otpUtils.js';
+import {
+  generateOTP,
+  getOTPExpirationTime,
+  verifyOTP,
+  checkOTPSendLimit,
+  checkResendCooldown,
+  checkWrongAttemptLimit,
+  checkEmailBlock
+} from '../utils/otpUtils.js';
 import { getDB } from '../db/index.js';
 
 const router = express.Router();
@@ -512,7 +520,44 @@ router.post('/send-otp', async (req, res) => {
     }
 
     const emailLower = email.toLowerCase();
+    const db = getDB();
     console.log(`📧 Sending OTP to: ${emailLower} for purpose: ${purpose}`);
+
+    // Check if email is currently blocked
+    const activeBlock = await db.getActiveOTPBlock(emailLower);
+    if (activeBlock) {
+      const blockStatus = checkEmailBlock(activeBlock);
+      if (blockStatus.blocked) {
+        return res.status(429).json({
+          error: `OTP limit reached. Try again in ${blockStatus.remaining} minute${blockStatus.remaining !== 1 ? 's' : ''}.`,
+          code: 'EMAIL_BLOCKED',
+          remainingMinutes: blockStatus.remaining
+        });
+      }
+    }
+
+    // Check OTP send history for daily limit (3 per email per purpose per 24h)
+    const sendHistory = await db.getOTPSendHistory(emailLower, purpose, 24);
+    const sendLimitCheck = checkOTPSendLimit(sendHistory, 3);
+    if (sendLimitCheck.exceeded) {
+      return res.status(429).json({
+        error: 'OTP limit reached. Try again in 24 hours.',
+        code: 'DAILY_LIMIT_EXCEEDED'
+      });
+    }
+
+    // Check resend cooldown (30 seconds)
+    const lastOTP = await db.getOTP(emailLower);
+    if (lastOTP) {
+      const cooldownCheck = checkResendCooldown(lastOTP, 30);
+      if (!cooldownCheck.allowed) {
+        return res.status(429).json({
+          error: `Please wait ${cooldownCheck.remaining} second${cooldownCheck.remaining !== 1 ? 's' : ''} before requesting another OTP.`,
+          code: 'RESEND_COOLDOWN',
+          remainingSeconds: cooldownCheck.remaining
+        });
+      }
+    }
 
     // If this is for signup, make sure the email/mobile aren't already registered
     if (purpose === 'signup') {
@@ -520,11 +565,11 @@ router.post('/send-otp', async (req, res) => {
         return res.status(400).json({ error: 'Mobile number and country code are required' });
       }
 
-      if (await getDB().emailExists(emailLower)) {
+      if (await db.emailExists(emailLower)) {
         return res.status(409).json({ error: 'Email already registered' });
       }
 
-      if (await getDB().mobileNumberExists(mobileNumber)) {
+      if (await db.mobileNumberExists(mobileNumber)) {
         return res.status(409).json({ error: 'Mobile number already registered' });
       }
     }
@@ -541,9 +586,8 @@ router.post('/send-otp', async (req, res) => {
     const otp = generateOTP();
     const expiresAt = getOTPExpirationTime();
 
-    // Store OTP in database
-    const db = getDB();
-    await db.storeOTP(emailLower, otp, expiresAt);
+    // Store OTP in database (with purpose)
+    await db.storeOTP(emailLower, otp, expiresAt, purpose);
 
     // Send OTP via email
     await sendOTPEmail(emailLower, otp);
@@ -551,7 +595,8 @@ router.post('/send-otp', async (req, res) => {
     res.json({
       message: 'OTP sent successfully',
       email: emailLower,
-      expiresIn: '5 minutes'
+      expiresIn: '5 minutes',
+      remaining: sendLimitCheck.remaining - 1
     });
   } catch (error) {
     console.error('Send OTP error:', error);
@@ -578,10 +623,22 @@ router.post('/verify-otp', async (req, res) => {
     }
 
     const emailLower = email.toLowerCase();
+    const db = getDB();
     console.log(`🔐 Verifying OTP for: ${emailLower}`);
 
+    // Check if email is currently blocked
+    const activeBlock = await db.getActiveOTPBlock(emailLower);
+    if (activeBlock) {
+      const blockStatus = checkEmailBlock(activeBlock);
+      if (blockStatus.blocked) {
+        return res.status(429).json({
+          error: `Too many wrong attempts. Try again in ${blockStatus.remaining} minute${blockStatus.remaining !== 1 ? 's' : ''}.`,
+          code: 'EMAIL_BLOCKED_ATTEMPTS'
+        });
+      }
+    }
+
     // Get stored OTP from database
-    const db = getDB();
     const storedOTPData = await db.getOTP(emailLower);
 
     if (!storedOTPData) {
@@ -592,13 +649,53 @@ router.post('/verify-otp', async (req, res) => {
     const verificationResult = verifyOTP(otp, storedOTPData.otp, storedOTPData.expiresAt);
 
     if (!verificationResult.success) {
-      // If OTP expired, delete it from database
+      // Record the failed attempt
+      await db.recordOTPAttempt(emailLower, storedOTPData.id, storedOTPData.purpose, false);
+
+      // Get recent attempts for this OTP
+      const attempts = await db.getRecentOTPAttempts(emailLower, storedOTPData.id);
+      const attemptCheck = checkWrongAttemptLimit(attempts, 3);
+
+      // If OTP expired, delete it from database and return
       if (verificationResult.code === 'OTP_EXPIRED') {
         await db.deleteOTP(emailLower);
         console.log(`🗑️ Expired OTP deleted for: ${emailLower}`);
+        return res.status(400).json({ error: verificationResult.message });
       }
-      return res.status(400).json({ error: verificationResult.message });
+
+      // If wrong OTP attempts exceed limit (3 strikes)
+      if (attemptCheck.exceeded) {
+        // Invalidate the current OTP
+        await db.deleteOTP(emailLower);
+
+        // Check if this is repeated abuse (multiple blocks in 24h)
+        const failedBlocksInDay = await db.getFailedAttemptBlocksInDay(emailLower);
+        const blockDuration = failedBlocksInDay >= 2 ? 24 * 60 : 15; // 24 hours if 3+ blocks, else 15 minutes
+
+        // Add OTP block
+        await db.addOTPBlock(emailLower, `Too many wrong attempts (${attemptCheck.wrongAttempts})`, blockDuration);
+
+        console.log(`🚫 OTP attempts exceeded for ${emailLower}. Blocked for ${blockDuration} minutes.`);
+
+        return res.status(429).json({
+          error: `Too many wrong attempts. Try again in ${blockDuration === 1440 ? '24 hours' : '15 minutes'}.`,
+          code: 'TOO_MANY_WRONG_ATTEMPTS'
+        });
+      }
+
+      // Show remaining attempts (1st and 2nd wrong)
+      const remainingAttempts = attemptCheck.remaining;
+      console.log(`❌ Wrong OTP for ${emailLower}. Attempts remaining: ${remainingAttempts}`);
+
+      return res.status(400).json({
+        error: `Invalid OTP. Please check and try again. (${remainingAttempts} attempt${remainingAttempts !== 1 ? 's' : ''} remaining)`,
+        code: 'INVALID_OTP',
+        attemptsRemaining: remainingAttempts
+      });
     }
+
+    // Record successful attempt
+    await db.recordOTPAttempt(emailLower, storedOTPData.id, storedOTPData.purpose, true);
 
     // Delete OTP after successful verification
     await db.deleteOTP(emailLower);
@@ -608,7 +705,8 @@ router.post('/verify-otp', async (req, res) => {
     res.json({
       message: 'OTP verified successfully',
       email: emailLower,
-      verified: true
+      verified: true,
+      purpose: storedOTPData.purpose
     });
   } catch (error) {
     console.error('Verify OTP error:', error);

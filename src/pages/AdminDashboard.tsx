@@ -43,8 +43,10 @@ import { AdminTestimonialForm } from "@/components/AdminTestimonialForm";
 import { AdminReportsView } from "@/components/dashboardViews/AdminReportsView";
 import { CustomerManagementView } from "@/components/dashboardViews/CustomerManagementView";
 import { UserManagementSystemView } from "@/components/dashboardViews/UserManagementSystemView";
+import { AdminOTPManagementView } from "@/components/dashboardViews/AdminOTPManagementView";
 import { ChangePasswordModal } from "@/components/ChangePasswordModal";
 import { changeUserPassword } from "@/lib/api";
+import { Shield } from "lucide-react";
 
 const AdminDashboard = () => {
   const { user, isAuthenticated, isAdmin, logout, isLoading: authLoading } = useAuth();
@@ -261,6 +263,7 @@ const AdminDashboard = () => {
             { id: "bookings", label: "Bookings", icon: Briefcase },
             { id: "reviews", label: "Testimonials", icon: FileText },
             { id: "coupons", label: "Coupons", icon: Briefcase },
+            { id: "otp", label: "OTP Management", icon: Shield },
             { id: "reports", label: "Reports & Analytics", icon: LineChart },
             { id: "settings", label: "Settings", icon: Settings },
           ].map((item) => {
@@ -804,6 +807,8 @@ const AdminDashboard = () => {
             <AdminTestimonialsView testimonials={testimonials} onDataChange={loadData} />
           ) : activeNav === "coupons" ? (
             <AdminCouponsView initialCoupons={coupons} onDataChange={loadData} />
+          ) : activeNav === "otp" ? (
+            <AdminOTPManagementView />
           ) : activeNav === "settings" ? (
             <div className="space-y-6">
               {/* Header */}

@@ -225,7 +225,39 @@ export class PostgresDatabase extends IDatabase {
         email TEXT UNIQUE NOT NULL,
         otp TEXT NOT NULL,
         expires_at TEXT NOT NULL,
-        created_at TEXT NOT NULL
+        created_at TEXT NOT NULL,
+        purpose TEXT NOT NULL DEFAULT 'signup'
+      )
+    `);
+
+    await this._query(`
+      CREATE TABLE IF NOT EXISTS otp_send_history (
+        id SERIAL PRIMARY KEY,
+        email TEXT NOT NULL,
+        purpose TEXT NOT NULL,
+        sent_at TEXT NOT NULL
+      )
+    `);
+
+    await this._query(`
+      CREATE TABLE IF NOT EXISTS otp_attempts (
+        id SERIAL PRIMARY KEY,
+        email TEXT NOT NULL,
+        otp_id INTEGER NOT NULL,
+        purpose TEXT NOT NULL,
+        attempted_at TEXT NOT NULL,
+        is_correct BOOLEAN NOT NULL DEFAULT FALSE
+      )
+    `);
+
+    await this._query(`
+      CREATE TABLE IF NOT EXISTS otp_blocks (
+        id SERIAL PRIMARY KEY,
+        email TEXT NOT NULL,
+        block_reason TEXT NOT NULL,
+        blocked_at TEXT NOT NULL,
+        unblock_at TEXT NOT NULL,
+        is_active BOOLEAN NOT NULL DEFAULT TRUE
       )
     `);
 
@@ -235,6 +267,9 @@ export class PostgresDatabase extends IDatabase {
     await this._query(`CREATE INDEX IF NOT EXISTS idx_testimonials_user_id ON testimonials(user_id)`);
     await this._query(`CREATE INDEX IF NOT EXISTS idx_coupons_code ON coupons(code)`);
     await this._query(`CREATE INDEX IF NOT EXISTS idx_otp_verifications_email ON otp_verifications(email)`);
+    await this._query(`CREATE INDEX IF NOT EXISTS idx_otp_send_history_email_purpose ON otp_send_history(email, purpose)`);
+    await this._query(`CREATE INDEX IF NOT EXISTS idx_otp_attempts_email ON otp_attempts(email)`);
+    await this._query(`CREATE INDEX IF NOT EXISTS idx_otp_blocks_email ON otp_blocks(email)`);
   }
 
   async _ensureUsersColumnOrder() {
@@ -809,7 +844,7 @@ export class PostgresDatabase extends IDatabase {
 
   // ============ OTP Verifications Operations ============
 
-  async storeOTP(email, otp, expiresAt) {
+  async storeOTP(email, otp, expiresAt, purpose = 'signup') {
     try {
       const emailLower = email.toLowerCase();
       // Delete existing OTP for this email if any
@@ -817,9 +852,16 @@ export class PostgresDatabase extends IDatabase {
 
       // Insert new OTP
       await this._query(
-        `INSERT INTO otp_verifications (email, otp, expires_at, created_at)
-         VALUES ($1, $2, $3, $4)`,
-        [emailLower, otp, expiresAt, new Date().toISOString()]
+        `INSERT INTO otp_verifications (email, otp, expires_at, created_at, purpose)
+         VALUES ($1, $2, $3, $4, $5)`,
+        [emailLower, otp, expiresAt, new Date().toISOString(), purpose]
+      );
+
+      // Record in send history
+      await this._query(
+        `INSERT INTO otp_send_history (email, purpose, sent_at)
+         VALUES ($1, $2, $3)`,
+        [emailLower, purpose, new Date().toISOString()]
       );
 
       return { email: emailLower, otp, expiresAt };
@@ -832,7 +874,7 @@ export class PostgresDatabase extends IDatabase {
     try {
       const emailLower = email.toLowerCase();
       const result = await this._query(
-        `SELECT email, otp, expires_at FROM otp_verifications WHERE email = $1`,
+        `SELECT id, email, otp, expires_at, purpose FROM otp_verifications WHERE email = $1`,
         [emailLower]
       );
 
@@ -842,9 +884,11 @@ export class PostgresDatabase extends IDatabase {
 
       const row = result.rows[0];
       return {
+        id: row.id,
         email: row.email,
         otp: row.otp,
-        expiresAt: row.expires_at
+        expiresAt: row.expires_at,
+        purpose: row.purpose || 'signup'
       };
     } catch (error) {
       throw new Error(`Failed to get OTP: ${error.message}`);
@@ -871,6 +915,138 @@ export class PostgresDatabase extends IDatabase {
       return result.rowCount || 0;
     } catch (error) {
       throw new Error(`Failed to delete expired OTPs: ${error.message}`);
+    }
+  }
+
+  // ============ OTP Tracking Operations ============
+
+  async recordOTPAttempt(email, otpId, purpose, isCorrect = false) {
+    try {
+      const emailLower = email.toLowerCase();
+      await this._query(
+        `INSERT INTO otp_attempts (email, otp_id, purpose, attempted_at, is_correct)
+         VALUES ($1, $2, $3, $4, $5)`,
+        [emailLower, otpId, purpose, new Date().toISOString(), isCorrect]
+      );
+      return true;
+    } catch (error) {
+      throw new Error(`Failed to record OTP attempt: ${error.message}`);
+    }
+  }
+
+  async getRecentOTPAttempts(email, otpId, limit = 10) {
+    try {
+      const emailLower = email.toLowerCase();
+      const result = await this._query(
+        `SELECT id, email, otp_id, purpose, attempted_at, is_correct FROM otp_attempts
+         WHERE email = $1 AND otp_id = $2 ORDER BY attempted_at DESC LIMIT $3`,
+        [emailLower, otpId, limit]
+      );
+
+      return result.rows.map(row => ({
+        id: row.id,
+        email: row.email,
+        otpId: row.otp_id,
+        purpose: row.purpose,
+        attemptedAt: row.attempted_at,
+        isCorrect: row.is_correct
+      }));
+    } catch (error) {
+      throw new Error(`Failed to get OTP attempts: ${error.message}`);
+    }
+  }
+
+  async getOTPSendHistory(email, purpose, hours = 24) {
+    try {
+      const emailLower = email.toLowerCase();
+      const cutoffTime = new Date(Date.now() - hours * 60 * 60 * 1000).toISOString();
+      const result = await this._query(
+        `SELECT id, email, purpose, sent_at FROM otp_send_history
+         WHERE email = $1 AND purpose = $2 AND sent_at > $3 ORDER BY sent_at DESC`,
+        [emailLower, purpose, cutoffTime]
+      );
+
+      return result.rows.map(row => ({
+        id: row.id,
+        email: row.email,
+        purpose: row.purpose,
+        sentAt: row.sent_at
+      }));
+    } catch (error) {
+      throw new Error(`Failed to get OTP send history: ${error.message}`);
+    }
+  }
+
+  async addOTPBlock(email, blockReason, blockDurationMinutes = 15) {
+    try {
+      const emailLower = email.toLowerCase();
+      const blockedAt = new Date().toISOString();
+      const unblockAt = new Date(Date.now() + blockDurationMinutes * 60 * 1000).toISOString();
+
+      await this._query(
+        `INSERT INTO otp_blocks (email, block_reason, blocked_at, unblock_at, is_active)
+         VALUES ($1, $2, $3, $4, $5)`,
+        [emailLower, blockReason, blockedAt, unblockAt, true]
+      );
+      return true;
+    } catch (error) {
+      throw new Error(`Failed to add OTP block: ${error.message}`);
+    }
+  }
+
+  async getActiveOTPBlock(email) {
+    try {
+      const emailLower = email.toLowerCase();
+      const now = new Date().toISOString();
+      const result = await this._query(
+        `SELECT id, email, block_reason, blocked_at, unblock_at FROM otp_blocks
+         WHERE email = $1 AND is_active = true AND unblock_at > $2 ORDER BY unblock_at DESC LIMIT 1`,
+        [emailLower, now]
+      );
+
+      if (result.rows.length === 0) {
+        return null;
+      }
+
+      const row = result.rows[0];
+      return {
+        id: row.id,
+        email: row.email,
+        blockReason: row.block_reason,
+        blockedAt: row.blocked_at,
+        unblockAt: row.unblock_at
+      };
+    } catch (error) {
+      throw new Error(`Failed to get active OTP block: ${error.message}`);
+    }
+  }
+
+  async removeOTPBlock(email) {
+    try {
+      const emailLower = email.toLowerCase();
+      await this._query(
+        `UPDATE otp_blocks SET is_active = false WHERE email = $1 AND is_active = true`,
+        [emailLower]
+      );
+      return true;
+    } catch (error) {
+      throw new Error(`Failed to remove OTP block: ${error.message}`);
+    }
+  }
+
+  async getFailedAttemptBlocksInDay(email) {
+    try {
+      const emailLower = email.toLowerCase();
+      const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+      const result = await this._query(
+        `SELECT COUNT(*) as count FROM otp_blocks
+         WHERE email = $1 AND block_reason LIKE $2 AND blocked_at > $3`,
+        [emailLower, '%wrong%', oneDayAgo]
+      );
+
+      return parseInt(result.rows[0].count, 10) || 0;
+    } catch (error) {
+      throw new Error(`Failed to get failed attempt blocks: ${error.message}`);
     }
   }
 

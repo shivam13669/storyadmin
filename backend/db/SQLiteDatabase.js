@@ -156,7 +156,45 @@ export class SQLiteDatabase extends IDatabase {
           email TEXT UNIQUE NOT NULL,
           otp TEXT NOT NULL,
           expiresAt TEXT NOT NULL,
-          createdAt TEXT NOT NULL
+          createdAt TEXT NOT NULL,
+          purpose TEXT NOT NULL DEFAULT 'signup'
+        )
+      `);
+
+      // OTP Send History table - tracks all OTP send attempts per email per purpose
+      this.db.run(`
+        CREATE TABLE IF NOT EXISTS otp_send_history (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          email TEXT NOT NULL,
+          purpose TEXT NOT NULL,
+          sentAt TEXT NOT NULL,
+          FOREIGN KEY (email) REFERENCES users(email)
+        )
+      `);
+
+      // OTP Attempts table - tracks wrong OTP verification attempts
+      this.db.run(`
+        CREATE TABLE IF NOT EXISTS otp_attempts (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          email TEXT NOT NULL,
+          otp_id INTEGER NOT NULL,
+          purpose TEXT NOT NULL,
+          attemptedAt TEXT NOT NULL,
+          isCorrect INTEGER NOT NULL DEFAULT 0,
+          FOREIGN KEY (email) REFERENCES users(email)
+        )
+      `);
+
+      // OTP Blocks table - tracks email blocks due to abuse
+      this.db.run(`
+        CREATE TABLE IF NOT EXISTS otp_blocks (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          email TEXT NOT NULL,
+          blockReason TEXT NOT NULL,
+          blockedAt TEXT NOT NULL,
+          unblockAt TEXT NOT NULL,
+          isActive INTEGER NOT NULL DEFAULT 1,
+          FOREIGN KEY (email) REFERENCES users(email)
         )
       `);
 
@@ -166,6 +204,9 @@ export class SQLiteDatabase extends IDatabase {
       this.db.run(`CREATE INDEX IF NOT EXISTS idx_testimonials_userId ON testimonials(userId)`);
       this.db.run(`CREATE INDEX IF NOT EXISTS idx_coupons_code ON coupons(code)`);
       this.db.run(`CREATE INDEX IF NOT EXISTS idx_otp_verifications_email ON otp_verifications(email)`);
+      this.db.run(`CREATE INDEX IF NOT EXISTS idx_otp_send_history_email_purpose ON otp_send_history(email, purpose)`);
+      this.db.run(`CREATE INDEX IF NOT EXISTS idx_otp_attempts_email ON otp_attempts(email)`);
+      this.db.run(`CREATE INDEX IF NOT EXISTS idx_otp_blocks_email ON otp_blocks(email)`);
 
       this._save();
     } catch (error) {
@@ -683,7 +724,7 @@ export class SQLiteDatabase extends IDatabase {
 
   // ============ OTP Verifications Operations ============
 
-  async storeOTP(email, otp, expiresAt) {
+  async storeOTP(email, otp, expiresAt, purpose = 'signup') {
     try {
       const emailLower = email.toLowerCase();
       // Delete existing OTP for this email if any
@@ -691,9 +732,16 @@ export class SQLiteDatabase extends IDatabase {
 
       // Insert new OTP
       this.db.run(
-        `INSERT INTO otp_verifications (email, otp, expiresAt, createdAt)
-         VALUES (?, ?, ?, ?)`,
-        [emailLower, otp, expiresAt, new Date().toISOString()]
+        `INSERT INTO otp_verifications (email, otp, expiresAt, createdAt, purpose)
+         VALUES (?, ?, ?, ?, ?)`,
+        [emailLower, otp, expiresAt, new Date().toISOString(), purpose]
+      );
+
+      // Record in send history
+      this.db.run(
+        `INSERT INTO otp_send_history (email, purpose, sentAt)
+         VALUES (?, ?, ?)`,
+        [emailLower, purpose, new Date().toISOString()]
       );
 
       this._save();
@@ -707,7 +755,7 @@ export class SQLiteDatabase extends IDatabase {
     try {
       const emailLower = email.toLowerCase();
       const result = this.db.exec(
-        `SELECT email, otp, expiresAt FROM otp_verifications WHERE email = ?`,
+        `SELECT id, email, otp, expiresAt, purpose FROM otp_verifications WHERE email = ?`,
         [emailLower]
       );
 
@@ -717,9 +765,11 @@ export class SQLiteDatabase extends IDatabase {
 
       const row = result[0].values[0];
       return {
-        email: row[0],
-        otp: row[1],
-        expiresAt: row[2]
+        id: row[0],
+        email: row[1],
+        otp: row[2],
+        expiresAt: row[3],
+        purpose: row[4] || 'signup'
       };
     } catch (error) {
       throw new Error(`Failed to get OTP: ${error.message}`);
@@ -740,7 +790,7 @@ export class SQLiteDatabase extends IDatabase {
   async deleteExpiredOTPs() {
     try {
       const now = new Date().toISOString();
-      const stmt = this.db.prepare(`DELETE FROM otp_verifications WHERE expires_at < ?`);
+      const stmt = this.db.prepare(`DELETE FROM otp_verifications WHERE expiresAt < ?`);
       stmt.run([now]);
       this._save();
       // Return the number of rows deleted
@@ -748,6 +798,153 @@ export class SQLiteDatabase extends IDatabase {
       return result[0]?.values[0]?.[0] || 0;
     } catch (error) {
       throw new Error(`Failed to delete expired OTPs: ${error.message}`);
+    }
+  }
+
+  // ============ OTP Tracking Operations ============
+
+  async recordOTPAttempt(email, otpId, purpose, isCorrect = false) {
+    try {
+      const emailLower = email.toLowerCase();
+      this.db.run(
+        `INSERT INTO otp_attempts (email, otp_id, purpose, attemptedAt, isCorrect)
+         VALUES (?, ?, ?, ?, ?)`,
+        [emailLower, otpId, purpose, new Date().toISOString(), isCorrect ? 1 : 0]
+      );
+      this._save();
+      return true;
+    } catch (error) {
+      throw new Error(`Failed to record OTP attempt: ${error.message}`);
+    }
+  }
+
+  async getRecentOTPAttempts(email, otpId, limit = 10) {
+    try {
+      const emailLower = email.toLowerCase();
+      const result = this.db.exec(
+        `SELECT id, email, otp_id, purpose, attemptedAt, isCorrect FROM otp_attempts
+         WHERE email = ? AND otp_id = ? ORDER BY attemptedAt DESC LIMIT ?`,
+        [emailLower, otpId, limit]
+      );
+
+      if (!result || result.length === 0) {
+        return [];
+      }
+
+      return result[0].values.map(row => ({
+        id: row[0],
+        email: row[1],
+        otpId: row[2],
+        purpose: row[3],
+        attemptedAt: row[4],
+        isCorrect: row[5] === 1
+      }));
+    } catch (error) {
+      throw new Error(`Failed to get OTP attempts: ${error.message}`);
+    }
+  }
+
+  async getOTPSendHistory(email, purpose, hours = 24) {
+    try {
+      const emailLower = email.toLowerCase();
+      const cutoffTime = new Date(Date.now() - hours * 60 * 60 * 1000).toISOString();
+      const result = this.db.exec(
+        `SELECT id, email, purpose, sentAt FROM otp_send_history
+         WHERE email = ? AND purpose = ? AND sentAt > ? ORDER BY sentAt DESC`,
+        [emailLower, purpose, cutoffTime]
+      );
+
+      if (!result || result.length === 0) {
+        return [];
+      }
+
+      return result[0].values.map(row => ({
+        id: row[0],
+        email: row[1],
+        purpose: row[2],
+        sentAt: row[3]
+      }));
+    } catch (error) {
+      throw new Error(`Failed to get OTP send history: ${error.message}`);
+    }
+  }
+
+  async addOTPBlock(email, blockReason, blockDurationMinutes = 15) {
+    try {
+      const emailLower = email.toLowerCase();
+      const blockedAt = new Date().toISOString();
+      const unblockAt = new Date(Date.now() + blockDurationMinutes * 60 * 1000).toISOString();
+
+      this.db.run(
+        `INSERT INTO otp_blocks (email, blockReason, blockedAt, unblockAt, isActive)
+         VALUES (?, ?, ?, ?, ?)`,
+        [emailLower, blockReason, blockedAt, unblockAt, 1]
+      );
+      this._save();
+      return true;
+    } catch (error) {
+      throw new Error(`Failed to add OTP block: ${error.message}`);
+    }
+  }
+
+  async getActiveOTPBlock(email) {
+    try {
+      const emailLower = email.toLowerCase();
+      const now = new Date().toISOString();
+      const result = this.db.exec(
+        `SELECT id, email, blockReason, blockedAt, unblockAt FROM otp_blocks
+         WHERE email = ? AND isActive = 1 AND unblockAt > ? ORDER BY unblockAt DESC LIMIT 1`,
+        [emailLower, now]
+      );
+
+      if (!result || result.length === 0 || result[0].values.length === 0) {
+        return null;
+      }
+
+      const row = result[0].values[0];
+      return {
+        id: row[0],
+        email: row[1],
+        blockReason: row[2],
+        blockedAt: row[3],
+        unblockAt: row[4]
+      };
+    } catch (error) {
+      throw new Error(`Failed to get active OTP block: ${error.message}`);
+    }
+  }
+
+  async removeOTPBlock(email) {
+    try {
+      const emailLower = email.toLowerCase();
+      this.db.run(
+        `UPDATE otp_blocks SET isActive = 0 WHERE email = ? AND isActive = 1`,
+        [emailLower]
+      );
+      this._save();
+      return true;
+    } catch (error) {
+      throw new Error(`Failed to remove OTP block: ${error.message}`);
+    }
+  }
+
+  async getFailedAttemptBlocksInDay(email) {
+    try {
+      const emailLower = email.toLowerCase();
+      const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+      const result = this.db.exec(
+        `SELECT COUNT(*) as count FROM otp_blocks
+         WHERE email = ? AND blockReason LIKE '%wrong%' AND blockedAt > ?`,
+        [emailLower, oneDayAgo]
+      );
+
+      if (!result || result.length === 0) {
+        return 0;
+      }
+
+      return result[0].values[0][0];
+    } catch (error) {
+      throw new Error(`Failed to get failed attempt blocks: ${error.message}`);
     }
   }
 

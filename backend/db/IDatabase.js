@@ -223,4 +223,76 @@ export class IDatabase {
   async deleteExpiredOTPs() {
     throw new Error('Method not implemented');
   }
+
+  /**
+   * Record an OTP verification attempt
+   * @param {string} email - Email address
+   * @param {number} otpId - OTP record ID
+   * @param {string} purpose - Purpose of OTP (signup, password-reset)
+   * @param {boolean} isCorrect - Whether the attempt was correct
+   * @returns {Promise<boolean>} Success
+   */
+  async recordOTPAttempt(email, otpId, purpose, isCorrect = false) {
+    throw new Error('Method not implemented');
+  }
+
+  /**
+   * Get recent OTP verification attempts
+   * @param {string} email - Email address
+   * @param {number} otpId - OTP record ID
+   * @param {number} limit - Number of records to retrieve
+   * @returns {Promise<Array>} Array of attempt records
+   */
+  async getRecentOTPAttempts(email, otpId, limit = 10) {
+    throw new Error('Method not implemented');
+  }
+
+  /**
+   * Get OTP send history for a specific purpose
+   * @param {string} email - Email address
+   * @param {string} purpose - Purpose of OTP (signup, password-reset)
+   * @param {number} hours - Time window in hours
+   * @returns {Promise<Array>} Array of send history records
+   */
+  async getOTPSendHistory(email, purpose, hours = 24) {
+    throw new Error('Method not implemented');
+  }
+
+  /**
+   * Add an OTP block for an email
+   * @param {string} email - Email address
+   * @param {string} blockReason - Reason for the block
+   * @param {number} blockDurationMinutes - Duration of the block in minutes
+   * @returns {Promise<boolean>} Success
+   */
+  async addOTPBlock(email, blockReason, blockDurationMinutes = 15) {
+    throw new Error('Method not implemented');
+  }
+
+  /**
+   * Get active OTP block for an email
+   * @param {string} email - Email address
+   * @returns {Promise<Object|null>} Block record or null
+   */
+  async getActiveOTPBlock(email) {
+    throw new Error('Method not implemented');
+  }
+
+  /**
+   * Remove OTP block for an email
+   * @param {string} email - Email address
+   * @returns {Promise<boolean>} Success
+   */
+  async removeOTPBlock(email) {
+    throw new Error('Method not implemented');
+  }
+
+  /**
+   * Get count of failed attempt blocks in the last 24 hours
+   * @param {string} email - Email address
+   * @returns {Promise<number>} Count of blocks
+   */
+  async getFailedAttemptBlocksInDay(email) {
+    throw new Error('Method not implemented');
+  }
 }

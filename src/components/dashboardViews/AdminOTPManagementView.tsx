@@ -46,7 +46,13 @@ export const AdminOTPManagementView = () => {
   const [blockedEmails, setBlockedEmails] = useState<BlockedEmailItem[]>([]);
 
   const fetchOTPStats = async (emailToFetch?: string) => {
-    const emailValue = emailToFetch || email.trim();
+    // Ensure emailToFetch is a string if provided
+    let emailValue = '';
+    if (emailToFetch) {
+      emailValue = typeof emailToFetch === 'string' ? emailToFetch : String(emailToFetch);
+    } else {
+      emailValue = email.trim();
+    }
 
     if (!emailValue) {
       toast({
@@ -86,6 +92,20 @@ export const AdminOTPManagementView = () => {
       }
 
       const data = await response.json();
+      console.log('OTP Stats API Response:', data);
+      console.log('Email field type:', typeof data.email, 'Value:', data.email);
+
+      // Ensure email is a string, not an object
+      if (typeof data.email !== 'string') {
+        console.error('Email is not a string:', data.email);
+        // If email is an object, try to extract it
+        if (typeof data.email === 'object' && data.email !== null) {
+          data.email = data.email.email || JSON.stringify(data.email);
+        } else {
+          data.email = String(data.email || emailValue);
+        }
+      }
+
       setOtpStats(data);
       setSearchPerformed(true);
       setEmail(emailValue);
@@ -111,7 +131,8 @@ export const AdminOTPManagementView = () => {
 
     setLoading(true);
     try {
-      const url = `/api/admin/otp/block/${encodeURIComponent(otpStats.email)}`;
+      const emailStr = typeof otpStats.email === 'string' ? otpStats.email : String(otpStats.email);
+      const url = `/api/admin/otp/block/${encodeURIComponent(emailStr)}`;
       console.log('Removing block from:', url);
 
       const response = await fetch(url, {
@@ -152,7 +173,8 @@ export const AdminOTPManagementView = () => {
 
     setLoading(true);
     try {
-      const url = `/api/admin/otp/reset-send-limit/${encodeURIComponent(otpStats.email)}/${purpose}`;
+      const emailStr = typeof otpStats.email === 'string' ? otpStats.email : String(otpStats.email);
+      const url = `/api/admin/otp/reset-send-limit/${encodeURIComponent(emailStr)}/${purpose}`;
       console.log('Resetting limit from:', url);
 
       const response = await fetch(url, {
@@ -243,7 +265,7 @@ export const AdminOTPManagementView = () => {
           <Card className="border-0 shadow-md rounded-2xl">
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
-                <span>{otpStats.email}</span>
+                <span>{typeof otpStats.email === 'string' ? otpStats.email : String(otpStats.email)}</span>
                 {otpStats.activeBlock && (
                   <Badge variant="destructive" className="flex items-center gap-2">
                     <Lock className="w-3 h-3" />
@@ -412,7 +434,7 @@ export const AdminOTPManagementView = () => {
                   >
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="font-medium text-gray-900">{otpStats.email}</p>
+                        <p className="font-medium text-gray-900">{typeof otpStats.email === 'string' ? otpStats.email : String(otpStats.email)}</p>
                         <p className="text-sm text-red-600">{otpStats.activeBlock.blockReason}</p>
                         <p className="text-xs text-gray-500 mt-1">
                           Unblock at: {new Date(otpStats.activeBlock.unblockAt).toLocaleString()}

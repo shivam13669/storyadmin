@@ -42,7 +42,7 @@ export default function CookiePolicyPage() {
               {/* Introduction */}
               <section className="space-y-4 pb-8 border-b border-slate-200">
                 <p className="text-slate-700 leading-relaxed text-lg">
-                  Welcome to StoriesByFoot ("we," "our," or "us"). This Cookie Policy explains how we use cookies and similar tracking technologies on our website <a href="https://storiesbyfoot.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-semibold">https://storiesbyfoot.com</a> (the "Website") and related online services (collectively, the "Services").
+                  Welcome to Stories by Foot ("we," "our," or "us"). This Cookie Policy explains how we use cookies and similar tracking technologies on our website <a href="https://storiesbyfoot.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-semibold">https://storiesbyfoot.com</a> (the "Website") and related online services (collectively, the "Services").
                 </p>
                 <p className="text-slate-700 leading-relaxed text-lg">
                   By accessing or using our Website, you agree to the use of cookies in accordance with this Policy. If you do not agree, you may adjust your browser settings to disable cookies; however, some features of the Website may not function properly without them.
@@ -62,7 +62,7 @@ export default function CookiePolicyPage() {
                   </li>
                   <li className="flex gap-3">
                     <span className="text-primary font-bold min-w-fit">•</span>
-                    <span>How and why StoriesByFoot uses them</span>
+                    <span>How and why Stories by Foot uses them</span>
                   </li>
                   <li className="flex gap-3">
                     <span className="text-primary font-bold min-w-fit">•</span>
@@ -93,7 +93,7 @@ export default function CookiePolicyPage() {
               <section id="types-of-cookies-we-use" className="space-y-6 pb-8 border-b border-slate-200">
                 <h2 className="text-3xl font-bold text-slate-900">3. Types of Cookies We Use</h2>
                 <p className="text-slate-700 leading-relaxed mb-4">
-                  StoriesByFoot uses the following categories of cookies on its Website:
+                  Stories by Foot uses the following categories of cookies on its Website:
                 </p>
 
                 <div className="space-y-4 ml-4">
@@ -117,7 +117,7 @@ export default function CookiePolicyPage() {
                   <div className="pt-4 border-t border-slate-200">
                     <h3 className="font-bold text-slate-900 text-lg mb-2">3.4. Advertising and Third-Party Cookies</h3>
                     <p className="text-slate-700 leading-relaxed mb-2">Some cookies may be placed by third-party service providers for marketing, advertising, or social media purposes. These cookies may track your browsing activity across different websites.</p>
-                    <p className="text-slate-700 leading-relaxed">StoriesByFoot does not control these third-party cookies and encourages you to review their respective privacy and cookie policies.</p>
+                    <p className="text-slate-700 leading-relaxed">Stories by Foot does not control these third-party cookies and encourages you to review their respective privacy and cookie policies.</p>
                   </div>
                 </div>
               </section>
@@ -187,7 +187,7 @@ export default function CookiePolicyPage() {
               <section id="third-party-tools-and-services" className="space-y-4 pb-8 border-b border-slate-200">
                 <h2 className="text-3xl font-bold text-slate-900">6. Third-Party Tools and Services</h2>
                 <p className="text-slate-700 leading-relaxed mb-3">
-                  StoriesByFoot may use trusted third-party tools, such as:
+                  Stories by Foot may use trusted third-party tools, such as:
                 </p>
                 <ul className="space-y-3 text-slate-700 leading-relaxed ml-4">
                   <li className="flex gap-3">
@@ -264,7 +264,7 @@ export default function CookiePolicyPage() {
               <section className="space-y-4 pt-8">
                 <h2 className="text-3xl font-bold text-slate-900">Disclaimer</h2>
                 <p className="text-slate-700 leading-relaxed">
-                  Cookies help enhance your browsing experience and enable StoriesByFoot to improve its content and services. While we take reasonable precautions to protect your data, we cannot guarantee complete security against unauthorized access resulting from factors beyond our control.
+                  Cookies help enhance your browsing experience and enable Stories by Foot to improve its content and services. While we take reasonable precautions to protect your data, we cannot guarantee complete security against unauthorized access resulting from factors beyond our control.
                 </p>
               </section>
             </div>

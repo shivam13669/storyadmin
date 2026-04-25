@@ -216,9 +216,32 @@ const Footer = () => {
                 </ul>
               </div>
 
-              {/* Privacy Policy - Right */}
+              {/* Policy Pages */}
               <div className="md:w-1/3 order-2 md:order-3 text-center md:text-right text-[14px] text-white/30 font-['Poppins',sans-serif] tracking-[0.025em]">
-                <p className="mb-0"><a href="#" className="hover:text-[#01b3a7] transition-colors">Privacy Policy</a></p>
+                <div className="flex flex-col md:flex-row md:justify-end gap-2 md:gap-4">
+
+                  <Link
+                    to="/terms-condition"
+                    className="hover:text-[#01b3a7] transition-colors"
+                  >
+                    Terms & Condition
+                  </Link>
+
+                  <Link
+                    to="/privacy-policy"
+                    className="hover:text-[#01b3a7] transition-colors"
+                  >
+                    Privacy Policy
+                  </Link>
+
+                  <Link
+                    to="/cookie-policy"
+                    className="hover:text-[#01b3a7] transition-colors"
+                  >
+                    Cookie Policy
+                  </Link>
+
+                </div>
               </div>
 
             </div>

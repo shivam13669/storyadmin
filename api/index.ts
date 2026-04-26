@@ -1,4 +1,4 @@
-import type { VercelRequest, VercelResponse } from "@vercel/node";
+/* import type { VercelRequest, VercelResponse } from "@vercel/node";
 import express from "express";
 import cors from "cors";
 import { initDB } from "../backend/db/index.js";
@@ -81,3 +81,4 @@ export default async function handler(
     }
   }
 }
+*/
